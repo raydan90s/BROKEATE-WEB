@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { Ionicons } from '@/components/Icono';
 import { ActivityIndicator, Text, Touchable, View, abrirEnlace } from '@/components/rn';
-import { COLORES } from '@/constants/colores';
+import { useColores } from '@/context/ThemeContext';
 import { ApiError } from '@/services/http';
 
 import { getFeed } from '../services/feedApi';
@@ -28,6 +28,7 @@ function haceCuanto(iso: string | null): string {
 }
 
 function TarjetaNoticia({ noticia }: { noticia: NoticiaFeed }) {
+  const colores = useColores();
   const [imagenRota, setImagenRota] = useState(false);
   const tema = TEMAS.find((t) => t.id === noticia.tema);
   const conFoto = noticia.imagen != null && !imagenRota;
@@ -48,7 +49,7 @@ function TarjetaNoticia({ noticia }: { noticia: NoticiaFeed }) {
         // Sin imagen (o rota): el visual del tema en navy — nunca una foto que no
         // sea de la noticia, y nunca un hueco gris.
         <View className="h-24 w-full items-center justify-center bg-brand-ink">
-          <Ionicons name={tema?.icono ?? 'newspaper-outline'} size={34} color="#3A85C9" />
+          <Ionicons name={tema?.icono ?? 'newspaper-outline'} size={34} color={colores.azulPalido} />
         </View>
       )}
 
@@ -69,7 +70,7 @@ function TarjetaNoticia({ noticia }: { noticia: NoticiaFeed }) {
           </View>
           <Text className="text-caption text-text-muted">{haceCuanto(noticia.fecha)}</Text>
           <View className="flex-1" />
-          <Ionicons name="open-outline" size={14} color={COLORES.textoMuted} />
+          <Ionicons name="open-outline" size={14} color={colores.textoMuted} />
         </View>
       </View>
     </Touchable>
@@ -84,6 +85,7 @@ function TarjetaNoticia({ noticia }: { noticia: NoticiaFeed }) {
  * Si el backend está en modo respaldo, se avisa en vez de fingir tiempo real.
  */
 export default function FeedNoticias() {
+  const colores = useColores();
   const [tema, setTema] = useState<TemaFeed>('mercados');
   const [feed, setFeed] = useState<FeedResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -105,7 +107,9 @@ export default function FeedNoticias() {
   return (
     <View className="gap-3">
       <View className="mt-2 flex-row items-center gap-2">
-        <Ionicons name="newspaper-outline" size={16} color={COLORES.navy} />
+        {/* `navy` es una SUPERFICIE, no una tinta: en oscuro (#16233A) este icono
+            desaparecía contra el lienzo. El color de marca sí se ve en los dos temas. */}
+        <Ionicons name="newspaper-outline" size={16} color={colores.primario} />
         <Text className="text-caption font-bold uppercase text-text-secondary">
           Novedades del mercado
         </Text>
@@ -126,7 +130,7 @@ export default function FeedNoticias() {
               <Ionicons
                 name={t.icono}
                 size={13}
-                color={activo ? '#FFFFFF' : COLORES.azulMedio}
+                color={activo ? colores.textoSobrePrimario : colores.azulMedio}
               />
               <Text
                 className={`text-caption font-bold ${
@@ -149,13 +153,13 @@ export default function FeedNoticias() {
         </View>
       ) : !feed ? (
         <View className="items-center py-6">
-          <ActivityIndicator color={COLORES.primario} />
+          <ActivityIndicator color={colores.primario} />
         </View>
       ) : (
         <>
           {feed.fuente_datos === 'respaldo' ? (
             <View className="flex-row gap-2 rounded-2xl bg-stateAlpha-warningSoft p-3">
-              <Ionicons name="cloud-offline-outline" size={14} color={COLORES.advertencia} />
+              <Ionicons name="cloud-offline-outline" size={14} color={colores.advertencia} />
               <Text className="flex-1 text-caption leading-4 text-text-secondary">
                 Titulares de referencia: la fuente de noticias no está disponible ahora.
               </Text>

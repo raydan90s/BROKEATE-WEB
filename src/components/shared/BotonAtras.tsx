@@ -1,6 +1,7 @@
 import { IoArrowBack } from 'react-icons/io5';
 
 import { Touchable } from '@/components/rn';
+import { useColores } from '@/context/ThemeContext';
 
 /**
  * El "Atrás" de todas las cabeceras. Es una flecha, no texto.
@@ -10,13 +11,15 @@ import { Touchable } from '@/components/rn';
  * que se conserva `-m-1 p-1` pero sin el `hitSlop`.
  */
 export default function BotonAtras({ onPress }: { onPress: () => void }) {
+  const colores = useColores();
+
   return (
     <Touchable
       onPress={onPress}
       accessibilityLabel="Atrás"
       className="-m-1 w-fit p-1"
     >
-      <IoArrowBack size={24} color="#1E3A8A" />
+      <IoArrowBack size={24} color={colores.primario} />
     </Touchable>
   );
 }

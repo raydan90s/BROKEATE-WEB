@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { Ionicons } from '@/components/Icono';
 import { Modal, Text, Touchable, View } from '@/components/rn';
+import { useColores } from '@/context/ThemeContext';
 
 import type { ProviderInfo } from '../services/agentApi';
 
@@ -10,6 +11,7 @@ import type { ProviderInfo } from '../services/agentApi';
  * real: lo elegido viaja con cada mensaje. Solo se pueden elegir los que tienen key.
  */
 
+/** Los colores de marca DE CADA PROVEEDOR: no son de la paleta y no cambian con el tema. */
 const META: Record<string, { label: string; color: string }> = {
   google: { label: 'Gemini', color: '#4285F4' },
   openai: { label: 'OpenAI', color: '#10A37F' },
@@ -27,6 +29,7 @@ interface Props {
 }
 
 export default function ProviderSelector({ providers, value, onChange, onOpen }: Props) {
+  const colores = useColores();
   const [abierto, setAbierto] = useState(false);
 
   const abrir = () => {
@@ -48,7 +51,7 @@ export default function ProviderSelector({ providers, value, onChange, onOpen }:
       >
         <View style={{ backgroundColor: m.color }} className="h-2.5 w-2.5 rounded-full" />
         <Text className="text-caption font-semibold text-text-primary">{m.label}</Text>
-        <Ionicons name="chevron-down" size={12} color="#71717A" />
+        <Ionicons name="chevron-down" size={12} color={colores.textoMuted} />
       </Touchable>
 
       {/* Menú */}
@@ -84,7 +87,7 @@ export default function ProviderSelector({ providers, value, onChange, onOpen }:
                   </Text>
                 </View>
                 {seleccionado ? (
-                  <Ionicons name="checkmark-circle" size={20} color="#1E3A8A" />
+                  <Ionicons name="checkmark-circle" size={20} color={colores.primario} />
                 ) : null}
               </Touchable>
             );

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { Ionicons } from '@/components/Icono';
 import { Text, View } from '@/components/rn';
-import { COLORES } from '@/constants/colores';
+import { useColores } from '@/context/ThemeContext';
 
 import { getCotizaciones, type MarketQuote } from '../services/marketApi';
 
@@ -31,9 +31,10 @@ function formatearPrecio(q: MarketQuote): string {
 }
 
 function Tarjeta({ cotizacion }: { cotizacion: MarketQuote }) {
+  const colores = useColores();
   const sube = cotizacion.change_percent > 0;
   const baja = cotizacion.change_percent < 0;
-  const color = sube ? COLORES.exito : baja ? COLORES.error : COLORES.textoMuted;
+  const color = sube ? colores.exito : baja ? colores.error : colores.textoMuted;
 
   return (
     <View className="w-36 shrink-0 gap-1.5 rounded-2xl border border-surface-border bg-surface-background p-3.5 md:w-auto">
@@ -44,7 +45,7 @@ function Tarjeta({ cotizacion }: { cotizacion: MarketQuote }) {
         <Ionicons
           name="ellipse"
           size={6}
-          color={cotizacion.source === 'mock' ? COLORES.textoMuted : COLORES.exito}
+          color={cotizacion.source === 'mock' ? colores.textoMuted : colores.exito}
         />
       </View>
 

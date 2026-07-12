@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { ActivityIndicator, ScrollView, Text, TextInput, Touchable, View } from '@/components/rn';
+import { useColores } from '@/context/ThemeContext';
 import { useNavigation } from '@/routes/navegacion';
 
 import BotonAtras from '@/components/shared/BotonAtras';
@@ -19,6 +20,7 @@ import type { Pregunta } from '../types/inversionista';
  * El puntaje tampoco se calcula acá — se mandan los códigos y `scoring_rules` hace el resto.
  */
 export default function CuestionarioPage() {
+  const colores = useColores();
   const navigation = useNavigation();
 
   const [preguntas, setPreguntas] = useState<Pregunta[] | null>(null);
@@ -133,7 +135,7 @@ export default function CuestionarioPage() {
           }`}
         >
           {enviando ? (
-            <ActivityIndicator color="#FFFFFF" />
+            <ActivityIndicator color={colores.textoSobrePrimario} />
           ) : (
             <Text
               className={`text-body-md font-bold ${

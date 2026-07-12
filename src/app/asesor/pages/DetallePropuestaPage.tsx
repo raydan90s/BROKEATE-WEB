@@ -12,7 +12,7 @@ import EstadoBadge from '@/components/shared/EstadoBadge';
 import { Cargando, ErrorEstado } from '@/components/shared/Estados';
 import ExplicacionIA from '@/components/shared/ExplicacionIA';
 import SelectorInstrumento from '@/components/shared/SelectorInstrumento';
-import { COLORES } from '@/constants/colores';
+import { useColores } from '@/context/ThemeContext';
 import { ApiError } from '@/services/http';
 import { fechaHora, plazo, porcentaje, usd } from '@/utils/formato';
 
@@ -40,6 +40,7 @@ const DECISIONES: Record<Decision, string> = {
  * decide una sola vez (409 si alguien más ya lo hizo). Los USD los recalcula Postgres.
  */
 export default function DetallePropuestaPage() {
+  const colores = useColores();
   const navigation = useNavigation();
   const { params } = useRoute<{ proposalId: string }>();
   const { proposalId } = params;
@@ -184,7 +185,7 @@ export default function DetallePropuestaPage() {
             <Text className="text-body font-bold text-brand-primary">
               Ver cómo se calculó su perfil
             </Text>
-            <Ionicons name="chevron-forward" size={18} color="#14375E" />
+            <Ionicons name="chevron-forward" size={18} color={colores.primario} />
           </Touchable>
         </View>
 
@@ -192,7 +193,7 @@ export default function DetallePropuestaPage() {
         {detalle.banderas.length > 0 ? (
           <View className="gap-2 rounded-2xl bg-stateAlpha-warningSoft p-5">
             <View className="flex-row items-center gap-2">
-              <Ionicons name="flag" size={16} color="#C77700" />
+              <Ionicons name="flag" size={16} color={colores.advertencia} />
               <Text className="text-caption font-bold uppercase text-text-primary">
                 Puntos de atención
               </Text>
@@ -270,7 +271,7 @@ export default function DetallePropuestaPage() {
                     }
                     className="h-8 w-8 items-center justify-center rounded-xl bg-stateAlpha-errorSoft"
                   >
-                    <Ionicons name="close" size={18} color={COLORES.error} />
+                    <Ionicons name="close" size={18} color={colores.error} />
                   </Touchable>
                 </View>
                 <View className="flex-row items-center gap-3">
@@ -316,7 +317,7 @@ export default function DetallePropuestaPage() {
               Agregar del catálogo
             </Text>
             {catalogo === null ? (
-              <ActivityIndicator color={COLORES.primario} />
+              <ActivityIndicator color={colores.primario} />
             ) : (
               <SelectorInstrumento
                 tasas={catalogo}
@@ -406,7 +407,7 @@ export default function DetallePropuestaPage() {
                   }`}
                 >
                   {enviando === 'edited' ? (
-                    <ActivityIndicator color="#FFFFFF" />
+                    <ActivityIndicator color={colores.textoSobrePrimario} />
                   ) : (
                     <Text
                       className={`text-body-md font-bold ${
@@ -430,7 +431,7 @@ export default function DetallePropuestaPage() {
                   className="items-center rounded-2xl bg-brand-accent py-4"
                 >
                   {enviando === 'approved' ? (
-                    <ActivityIndicator color="#18181B" />
+                    <ActivityIndicator color={colores.textoSobreAcento} />
                   ) : (
                     <Text className="text-body-md font-bold text-text-onAccent">Aprobar</Text>
                   )}
@@ -454,7 +455,7 @@ export default function DetallePropuestaPage() {
                   }`}
                 >
                   {enviando === 'rejected' ? (
-                    <ActivityIndicator color="#FFFFFF" />
+                    <ActivityIndicator color={colores.textoSobrePrimario} />
                   ) : (
                     <Text
                       className={`text-body-md font-bold ${

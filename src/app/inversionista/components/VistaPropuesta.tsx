@@ -11,12 +11,12 @@ import EstadoBadge from '@/components/shared/EstadoBadge';
 import { Cargando, ErrorEstado } from '@/components/shared/Estados';
 import ExplicacionIA from '@/components/shared/ExplicacionIA';
 import SelectorInstrumento from '@/components/shared/SelectorInstrumento';
-import { COLORES } from '@/constants/colores';
+import { useColores } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 import { ApiError } from '@/services/http';
 import { plazo, porcentaje, puntos, usd } from '@/utils/formato';
 
-import DonutPortafolio, { COLORES as COLORES_DONUT } from './DonutPortafolio';
+import DonutPortafolio, { useColoresDonut } from './DonutPortafolio';
 import { getTasas } from '../services/catalogApi';
 import { editarAsignacion, getPropuesta } from '../services/investorApi';
 import type { TasaInstrumento } from '../types/catalogo';
@@ -86,17 +86,19 @@ function FilaAccion({
   detalle: string;
   onPress: () => void;
 }) {
+  const colores = useColores();
+
   return (
     <Touchable
       onPress={onPress}
       className="flex-row items-center gap-3 rounded-2xl border border-brand-primary bg-surface-background px-5 py-4"
     >
-      <Ionicons name={icono} size={20} color={COLORES.primario} />
+      <Ionicons name={icono} size={20} color={colores.primario} />
       <View className="flex-1">
         <Text className="text-body-md font-bold text-brand-primary">{titulo}</Text>
         <Text className="text-caption text-text-secondary">{detalle}</Text>
       </View>
-      <Ionicons name="chevron-forward" size={20} color={COLORES.primario} />
+      <Ionicons name="chevron-forward" size={20} color={colores.primario} />
     </Touchable>
   );
 }
@@ -115,6 +117,8 @@ interface Props {
  * Nunca muestra un número que el LLM haya inventado.
  */
 export default function VistaPropuesta({ sessionId, titulo = 'Tu propuesta' }: Props) {
+  const colores = useColores();
+  const COLORES_DONUT = useColoresDonut();
   const navigation = useNavigation();
   const { user } = useAuth();
   const [propuesta, setPropuesta] = useState<PortfolioProposal | null>(null);
@@ -265,7 +269,7 @@ export default function VistaPropuesta({ sessionId, titulo = 'Tu propuesta' }: P
               onPress={() => void abrirEdicion(propuesta)}
               className="flex-row items-center gap-1"
             >
-              <Ionicons name="create-outline" size={16} color={COLORES.primario} />
+              <Ionicons name="create-outline" size={16} color={colores.primario} />
               <Text className="text-body font-bold text-brand-primary">Editar mi mezcla</Text>
             </Touchable>
           ) : null}
@@ -304,7 +308,7 @@ export default function VistaPropuesta({ sessionId, titulo = 'Tu propuesta' }: P
                     }
                     className="h-8 w-8 items-center justify-center rounded-xl bg-stateAlpha-errorSoft"
                   >
-                    <Ionicons name="close" size={18} color={COLORES.error} />
+                    <Ionicons name="close" size={18} color={colores.error} />
                   </Touchable>
                 </View>
                 <View className="flex-row items-center gap-3">
@@ -348,7 +352,7 @@ export default function VistaPropuesta({ sessionId, titulo = 'Tu propuesta' }: P
               Agregar del catálogo
             </Text>
             {catalogo === null ? (
-              <ActivityIndicator color={COLORES.primario} />
+              <ActivityIndicator color={colores.primario} />
             ) : (
               <SelectorInstrumento
                 tasas={catalogo}
@@ -381,7 +385,7 @@ export default function VistaPropuesta({ sessionId, titulo = 'Tu propuesta' }: P
               }`}
             >
               {guardando ? (
-                <ActivityIndicator color="#FFFFFF" />
+                <ActivityIndicator color={colores.textoSobrePrimario} />
               ) : (
                 <Text
                   className={`text-body-md font-bold ${

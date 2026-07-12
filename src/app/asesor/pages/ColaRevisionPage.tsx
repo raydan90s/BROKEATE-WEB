@@ -107,7 +107,7 @@ export default function ColaRevisionPage() {
                     {item.cedula_ruc ?? 'Sin cédula registrada'} · {fechaHora(item.creada_en)}
                   </Text>
                 </View>
-                <Ionicons name="chevron-forward" size={20} color="#A1A1AA" />
+                <Ionicons name="chevron-forward" size={20} color={colores.textoMuted} />
               </View>
 
               <View className="flex-row items-center gap-2">

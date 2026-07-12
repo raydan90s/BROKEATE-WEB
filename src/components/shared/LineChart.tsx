@@ -1,4 +1,5 @@
 import { Text, View } from '@/components/rn';
+import { useColores } from '@/context/ThemeContext';
 
 /**
  * Gráfico de líneas genérico, a mano con SVG (mismo enfoque que `DonutPortafolio`).
@@ -28,10 +29,15 @@ const VBW = 320;
 
 export default function LineChart({
   points,
-  color = '#14375E',
+  color,
   height = ALTURA_DEFAULT,
   formatValue = (v) => v.toFixed(2),
 }: Props) {
+  // Sin `color` explícito, la línea es la de marca DEL TEMA ACTIVO. Era un `#14375E` fijo,
+  // y ese azul marino sobre el lienzo oscuro no se distinguía del fondo.
+  const colores = useColores();
+  const trazo = color ?? colores.primario;
+
   if (points.length < 2) {
     return (
       <View style={{ height }} className="items-center justify-center">
@@ -78,21 +84,21 @@ export default function LineChart({
         >
           <defs>
             <linearGradient id="lineChartArea" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor={color} stopOpacity={0.18} />
-              <stop offset="1" stopColor={color} stopOpacity={0} />
+              <stop offset="0" stopColor={trazo} stopOpacity={0.18} />
+              <stop offset="1" stopColor={trazo} stopOpacity={0} />
             </linearGradient>
           </defs>
           <path d={area} fill="url(#lineChartArea)" stroke="none" />
           <path
             d={linea}
-            stroke={color}
+            stroke={trazo}
             strokeWidth={2.5}
             fill="none"
             strokeLinejoin="round"
             strokeLinecap="round"
             vectorEffect="non-scaling-stroke"
           />
-          <circle cx={ultimoPunto.x} cy={ultimoPunto.y} r={4} fill={color} />
+          <circle cx={ultimoPunto.x} cy={ultimoPunto.y} r={4} fill={trazo} />
         </svg>
       </div>
 

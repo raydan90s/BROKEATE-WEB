@@ -2,7 +2,7 @@ import { IoAddCircleOutline, IoLockClosedOutline } from 'react-icons/io5';
 
 import { Text, Touchable, View } from '@/components/rn';
 import type { TasaInstrumento } from '@/app/inversionista/types/catalogo';
-import { COLORES } from '@/constants/colores';
+import { useColores } from '@/context/ThemeContext';
 import { porcentaje } from '@/utils/formato';
 
 interface Props {
@@ -21,6 +21,7 @@ interface Props {
  * guardar: esconder la fila enseñaría menos que mostrarla bloqueada.
  */
 export default function SelectorInstrumento({ tasas, excluir, onAgregar }: Props) {
+  const colores = useColores();
   const disponibles = tasas.filter((t) => !excluir.includes(t.code));
 
   if (disponibles.length === 0) {
@@ -45,9 +46,9 @@ export default function SelectorInstrumento({ tasas, excluir, onAgregar }: Props
             } ${bloqueada ? 'opacity-50' : ''}`}
           >
             {bloqueada ? (
-              <IoLockClosedOutline size={22} color={COLORES.textoMuted} />
+              <IoLockClosedOutline size={22} color={colores.textoMuted} />
             ) : (
-              <IoAddCircleOutline size={22} color={COLORES.primario} />
+              <IoAddCircleOutline size={22} color={colores.primario} />
             )}
             <View className="flex-1">
               <Text className="text-body font-bold text-text-primary" numberOfLines={1}>

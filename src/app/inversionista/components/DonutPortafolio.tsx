@@ -1,9 +1,17 @@
 import { Text, View } from '@/components/rn';
+import { useColores } from '@/context/ThemeContext';
 
 import type { AssetAllocation } from '../types/inversionista';
 
-/** Un color por línea. El orden es estable: la leyenda y el donut siempre coinciden. */
-export const COLORES = ['#0A2540', '#1E5C9B', '#3A85C9', '#9BB8D4', '#1B8A5A'];
+/**
+ * Un color por línea. El orden es estable: la leyenda y el donut siempre coinciden.
+ *
+ * Es un hook y no una constante porque la serie cambia con el tema: en oscuro el `#0A2540`
+ * del primer segmento era un agujero negro contra el lienzo, no un segmento.
+ */
+export function useColoresDonut(): readonly string[] {
+  return useColores().grafico;
+}
 
 interface DonutProps {
   allocations: AssetAllocation[];
@@ -31,6 +39,8 @@ export default function DonutPortafolio({
   centro,
   etiquetaCentro,
 }: DonutProps) {
+  const COLORES = useColoresDonut();
+  const colores = useColores();
   let acumulado = 0;
 
   return (
@@ -43,7 +53,7 @@ export default function DonutPortafolio({
               cx={LADO / 2}
               cy={LADO / 2}
               r={RADIO}
-              stroke="#F4F4F5"
+              stroke={colores.superficieSecundaria}
               strokeWidth={GROSOR}
               fill="none"
             />

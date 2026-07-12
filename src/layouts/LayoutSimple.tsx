@@ -10,7 +10,12 @@ import Shell from './Shell'
 export default function LayoutSimple() {
   return (
     <Shell>
-      <Outlet />
+      {/* El Shell ya no scrollea (es del alto exacto de la ventana), así que la pantalla
+          necesita su propia zona con scroll. Las que traen ScrollView se bastan solas y
+          esta nunca se activa; las que no, al menos no quedan recortadas. */}
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+        <Outlet />
+      </div>
     </Shell>
   )
 }

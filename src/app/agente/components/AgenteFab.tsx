@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { Ionicons } from '@/components/Icono';
 import { Touchable, View } from '@/components/rn';
+import { useColores } from '@/context/ThemeContext';
 import { useNavigation } from '@/routes/navegacion';
 
 import AgentSheet from './AgentSheet';
@@ -23,6 +24,7 @@ export default function AgenteFab({
   /** Separación desde abajo. Se sube cuando la pantalla tiene una barra sticky. */
   bottom?: number;
 }) {
+  const colores = useColores();
   const navigation = useNavigation();
   const [abierto, setAbierto] = useState(false);
 
@@ -42,7 +44,7 @@ export default function AgenteFab({
               accessibilityLabel="Pregúntame por WhatsApp"
               className="h-14 w-14 items-center justify-center rounded-full bg-state-success shadow-lg"
             >
-              <Ionicons name="logo-whatsapp" size={24} color="#FFFFFF" />
+              <Ionicons name="logo-whatsapp" size={24} color={colores.textoSobrePrimario} />
             </Touchable>
           </div>
 
@@ -52,7 +54,7 @@ export default function AgenteFab({
             accessibilityLabel="Abrir el asistente"
             className="h-14 w-14 items-center justify-center rounded-full bg-brand-primary shadow-lg"
           >
-            <Ionicons name="sparkles" size={24} color="#FFFFFF" />
+            <Ionicons name="sparkles" size={24} color={colores.textoSobrePrimario} />
             {/* Puntito de acento: da la sensación de "vivo". */}
             <View className="absolute right-3 top-3 h-2.5 w-2.5 rounded-full border-2 border-brand-primary bg-brand-accent" />
           </Touchable>

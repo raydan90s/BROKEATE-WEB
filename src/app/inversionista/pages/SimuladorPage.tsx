@@ -8,7 +8,7 @@ import { recomendarSimulacion } from '@/app/agente/services/agentApi';
 import type { SimuladorResponse } from '@/app/agente/services/agentApi';
 import { Cargando, ErrorEstado } from '@/components/shared/Estados';
 import Tarjeta from '@/components/shared/Tarjeta';
-import { COLORES } from '@/constants/colores';
+import { useColores } from '@/context/ThemeContext';
 import { ApiError } from '@/services/http';
 import { montoANumero, montoConSeparadores, porcentaje, usd } from '@/utils/formato';
 
@@ -37,6 +37,7 @@ const TIPOS: { etiqueta: string; valor: TasaInstrumento['product_type'] }[] = [
  * interés y monto final. La "mejor" la marca el backend (`recomendado`).
  */
 export default function SimuladorPage() {
+  const colores = useColores();
   const navigation = useNavigation();
 
   const [montoTexto, setMontoTexto] = useState('10.000');
@@ -119,7 +120,7 @@ export default function SimuladorPage() {
           onPress={() => navigation.goBack()}
           className="h-8 w-8 items-center justify-center rounded-xl"
         >
-          <Ionicons name="chevron-back" size={22} color={COLORES.primario} />
+          <Ionicons name="chevron-back" size={22} color={colores.primario} />
         </Touchable>
         <View className="flex-1">
           <Text className="text-title font-bold text-text-primary">Simulador</Text>
@@ -313,6 +314,7 @@ function OpcionDestacada({
   esSeleccion: boolean;
   onQuitarSeleccion: () => void;
 }) {
+  const colores = useColores();
   const bloqueada = tasa.elegible === false || tasa.cumple_monto_minimo === false;
 
   return (
@@ -372,7 +374,7 @@ function OpcionDestacada({
 
         {tasa.elegible === false && tasa.motivo_no_elegible ? (
           <View className="flex-row gap-2 rounded-xl bg-stateAlpha-warningSoft p-3">
-            <Ionicons name="lock-closed-outline" size={14} color={COLORES.advertencia} />
+            <Ionicons name="lock-closed-outline" size={14} color={colores.advertencia} />
             <Text className="flex-1 text-caption leading-4 text-text-secondary">
               <Text className="font-bold">Tu perfil no admite este emisor. </Text>
               {tasa.motivo_no_elegible}
@@ -382,7 +384,7 @@ function OpcionDestacada({
 
         {tasa.cumple_monto_minimo === false ? (
           <View className="flex-row gap-2 rounded-xl bg-stateAlpha-warningSoft p-3">
-            <Ionicons name="alert-circle-outline" size={14} color={COLORES.advertencia} />
+            <Ionicons name="alert-circle-outline" size={14} color={colores.advertencia} />
             <Text className="flex-1 text-caption leading-4 text-text-secondary">
               <Text className="font-bold">El monto no alcanza. </Text>
               Este producto pide un mínimo de {usd(tasa.monto_minimo)}.
@@ -408,6 +410,7 @@ function FilaSimulada({
   elegida: boolean;
   onPress: () => void;
 }) {
+  const colores = useColores();
   const bloqueada = tasa.elegible === false || tasa.cumple_monto_minimo === false;
   const motivo =
     tasa.elegible === false
@@ -426,7 +429,7 @@ function FilaSimulada({
       <Ionicons
         name={elegida ? 'radio-button-on' : 'radio-button-off'}
         size={18}
-        color={elegida ? COLORES.primario : COLORES.borde}
+        color={elegida ? colores.primario : colores.textoMuted}
       />
 
       <View className={`flex-1 ${bloqueada && !elegida ? 'opacity-60' : ''}`}>

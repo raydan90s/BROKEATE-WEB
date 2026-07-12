@@ -1,37 +1,4 @@
 /**
- * Tokens de Brokeate para props que no aceptan className
- * (color de Ionicons, ActivityIndicator, stroke de SVG…).
- *
- * Para estilos de layout usa las clases de Tailwind (`bg-brand-primary`);
- * este archivo existe solo porque esas props exigen un string de color.
- * Misma paleta que tailwind.config.js — si cambias una, cambia la otra.
- */
-export const COLORES = {
-  navy: '#0A2540',
-  primario: '#14375E',
-  azulMedio: '#1E5C9B',
-  azulPalido: '#3A85C9',
-  exito: '#1B8A5A',
-  advertencia: '#C77700',
-  error: '#C0362C',
-  oro: '#B7921A',
-  textoSecundario: '#3A3F47',
-  textoMuted: '#6B7280',
-  borde: '#E8EBF0',
-  fondo: '#F2F5F9',
-} as const;
-
-/** Colores por perfil de riesgo (PROFILE_COLORS del prototipo Brokeate). */
-export const COLOR_PERFIL: Record<string, string> = {
-  conservador: COLORES.primario,
-  moderado: COLORES.advertencia,
-  agresivo: COLORES.error,
-};
-
-/** Paleta para segmentos de gráficos (chart-1…5 del prototipo). */
-export const COLORES_GRAFICO = ['#0A2540', '#1E5C9B', '#3A85C9', '#9BB8D4', '#1B8A5A'];
-
-/**
  * Paleta por tema, para props que NO aceptan className (color de Ionicons,
  * ActivityIndicator, stroke de SVG…). Copia en JS de las variables de src/index.css:
  * si cambias un hex aquí, cambia su triplete allá — son la misma paleta en dos lenguajes.
@@ -103,32 +70,32 @@ const CLARA: Paleta = {
 
 const OSCURA: Paleta = {
   navy: '#16233A',
-  primario: '#5B9BE0',
-  azulMedio: '#7CB2E8',
-  azulPalido: '#9FC8EE',
-  acento: '#35C58A',
-  exito: '#35C58A',
-  advertencia: '#E0A33C',
-  error: '#F1685C',
-  info: '#7CB2E8',
-  oro: '#D8B23F',
-  textoPrimario: '#E8EEF7',
-  textoSecundario: '#B6C0CF',
-  textoMuted: '#8A97A8',
+  primario: '#7DB3F0',
+  azulMedio: '#9AC7F5',
+  azulPalido: '#BAD9F7',
+  acento: '#40D698',
+  exito: '#40D698',
+  advertencia: '#F0B54C',
+  error: '#F88074',
+  info: '#9AC7F5',
+  oro: '#E3BE4F',
+  textoPrimario: '#EDF2FA',
+  textoSecundario: '#C9D3E0',
+  textoMuted: '#9EACBE',
   // En oscuro el botón se aclara, así que su etiqueta se oscurece.
-  textoSobrePrimario: '#0A1220',
-  textoSobreAcento: '#06231A',
+  textoSobrePrimario: '#08101C',
+  textoSobreAcento: '#041E16',
   superficie: '#121B2B',
-  superficieSecundaria: '#1B2537',
-  superficieElevada: '#1E293D',
-  borde: '#2A3547',
+  superficieSecundaria: '#1E293C',
+  superficieElevada: '#212D43',
+  borde: '#39475E',
   fondo: '#0A111D',
   velo: 'rgba(0,0,0,0.65)',
-  grafico: ['#7CB2E8', '#5B9BE0', '#9FC8EE', '#6C829E', '#35C58A'],
+  grafico: ['#9AC7F5', '#7DB3F0', '#BAD9F7', '#8298B5', '#40D698'],
   perfil: {
-    conservador: '#6BA6E0',
-    moderado: '#E0A33C',
-    agresivo: '#F1685C',
+    conservador: '#7DB3F0',
+    moderado: '#F0B54C',
+    agresivo: '#F88074',
   },
 };
 

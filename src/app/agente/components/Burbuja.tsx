@@ -1,5 +1,6 @@
 import { Ionicons } from '@/components/Icono';
 import { Text, View } from '@/components/rn';
+import { useColores } from '@/context/ThemeContext';
 
 import type { SourceChip } from '../services/agentApi';
 import SourceChips from './SourceChips';
@@ -42,14 +43,16 @@ function TypingDots() {
 
 /** Avatar del asistente: cuadrito con brillo, en el azul de marca. */
 function AvatarAsistente() {
+  const colores = useColores();
   return (
     <View className="h-8 w-8 items-center justify-center rounded-xl bg-brandAlpha-primarySoft">
-      <Ionicons name="sparkles" size={15} color="#1E3A8A" />
+      <Ionicons name="sparkles" size={15} color={colores.primario} />
     </View>
   );
 }
 
 export default function Burbuja({ mensaje }: { mensaje: Mensaje }) {
+  const colores = useColores();
   const esUsuario = mensaje.role === 'user';
 
   if (esUsuario) {
@@ -85,7 +88,7 @@ export default function Burbuja({ mensaje }: { mensaje: Mensaje }) {
                   catálogo del banco. Va ANTES del texto para que no pase inadvertido. */}
               {externa ? (
                 <View className="mb-1.5 flex-row items-center gap-1.5">
-                  <Ionicons name="alert-circle" size={13} color="#C77700" />
+                  <Ionicons name="alert-circle" size={13} color={colores.advertencia} />
                   <Text className="text-caption font-bold uppercase text-state-warning">
                     Simulación educativa · fuera del banco
                   </Text>

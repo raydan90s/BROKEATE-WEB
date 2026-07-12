@@ -2,9 +2,10 @@ import { Ionicons } from '@/components/Icono';
 import { Text, Touchable, View } from '@/components/rn';
 
 import EstadoBadge from '@/components/shared/EstadoBadge';
+import { useColores } from '@/context/ThemeContext';
 import { porcentaje, puntos, usd } from '@/utils/formato';
 
-import { COLOR_PERFIL } from './BarraCapital';
+import { useColorPerfil } from './BarraCapital';
 import type { Subcuenta } from '../types/inversionista';
 
 interface Props {
@@ -17,7 +18,8 @@ interface Props {
  * qué punto de la revisión va. Todos los números vienen servidos por el backend.
  */
 export default function TarjetaSubcuenta({ subcuenta, onPress }: Props) {
-  const color = COLOR_PERFIL[subcuenta.perfil];
+  const color = useColorPerfil()[subcuenta.perfil];
+  const colores = useColores();
 
   return (
     <Touchable
@@ -36,11 +38,16 @@ export default function TarjetaSubcuenta({ subcuenta, onPress }: Props) {
           </Text>
         </View>
 
-        <Ionicons name="chevron-forward" size={20} color="#A1A1AA" />
+        <Ionicons name="chevron-forward" size={20} color={colores.textoMuted} />
       </View>
 
       <View className="flex-row flex-wrap items-center gap-2">
-        <View className="rounded-full px-3 py-1" style={{ backgroundColor: `${color}1A` }}>
+        {/* El borde no es adorno: un tinte al 12% sobre la tarjeta oscura casi no se
+            distingue de ella, y el chip se leía como texto suelto. */}
+        <View
+          className="rounded-full border px-3 py-1"
+          style={{ backgroundColor: `${color}1F`, borderColor: `${color}5C` }}
+        >
           <Text className="text-caption font-bold capitalize" style={{ color }}>
             {subcuenta.perfil} · {puntos(subcuenta.puntaje, subcuenta.puntaje_max)}
           </Text>

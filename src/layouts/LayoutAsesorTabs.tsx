@@ -20,26 +20,30 @@ const PESTANAS = [
 export default function LayoutAsesorTabs() {
   return (
     <Shell>
-      <div className="flex-1 overflow-y-auto">
-        <Outlet />
-      </div>
-
-      <nav className="flex border-t border-surface-border bg-surface-background">
+      {/* Arriba, igual que las del inversionista: ver LayoutInversionistaTabs. */}
+      <nav className="flex shrink-0 gap-1 border-b border-surface-border bg-surface-background px-4">
         {PESTANAS.map(({ a, texto, Icono }) => (
           <NavLink
             key={a}
             to={a}
             className={({ isActive }) =>
-              `flex flex-1 flex-col items-center gap-1 py-3 text-caption font-bold transition-colors ${
-                isActive ? 'text-brand-primary' : 'text-text-muted hover:text-brand-mid'
+              `flex flex-row items-center gap-2 border-b-2 px-4 py-3 text-body font-bold transition-colors ${
+                isActive
+                  ? 'border-brand-primary text-brand-primary'
+                  : 'border-transparent text-text-muted hover:text-brand-mid'
               }`
             }
           >
-            <Icono size={22} />
+            <Icono size={20} />
             {texto}
           </NavLink>
         ))}
       </nav>
+
+      {/* Sin `min-h-0` esta zona crece y rompe el scroll interno. */}
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+        <Outlet />
+      </div>
     </Shell>
   )
 }
