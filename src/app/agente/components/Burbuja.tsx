@@ -20,12 +20,6 @@ export interface Mensaje {
   error?: boolean;
 }
 
-function etiquetaModelo(modelo: string): string | null {
-  if (modelo === 'refuse') return null; // rechazo por alcance: no viene de un modelo
-  if (modelo === 'plantilla-determinista') return 'plantilla (sin IA)';
-  return modelo;
-}
-
 /** true si la ruta cita mercados externos (Alpha Vantage), simulados y fuera del banco. */
 function esRutaExterna(ruta?: Mensaje['ruta']): boolean {
   return ruta === 'mixto' || ruta === 'externo';
@@ -98,23 +92,13 @@ export default function Burbuja({ mensaje }: { mensaje: Mensaje }) {
                 </View>
               ) : null}
               <Text
-                className={`text-body ${mensaje.error ? 'text-state-error' : 'text-text-primary'}`}
+                className={`text-body whitespace-pre-line ${mensaje.error ? 'text-state-error' : 'text-text-primary'}`}
               >
                 {mensaje.texto}
               </Text>
             </>
           )}
         </View>
-
-        {/* Prueba de qué modelo contestó este turno. */}
-        {!mensaje.pending && mensaje.modelo && etiquetaModelo(mensaje.modelo) ? (
-          <View className="mt-1 flex-row items-center gap-1">
-            <Ionicons name="hardware-chip-outline" size={10} color="#A1A1AA" />
-            <Text className="text-caption text-text-muted">
-              vía {etiquetaModelo(mensaje.modelo)}
-            </Text>
-          </View>
-        ) : null}
 
         {mensaje.sources?.length ? <SourceChips sources={mensaje.sources} /> : null}
       </View>
