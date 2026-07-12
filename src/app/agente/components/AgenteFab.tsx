@@ -40,9 +40,9 @@ export default function AgenteFab({
             <Touchable
               onPress={() => navigation.navigate('VincularWhatsApp')}
               accessibilityLabel="Pregúntame por WhatsApp"
-              className="h-12 w-12 items-center justify-center rounded-full bg-state-success shadow-lg"
+              className="h-14 w-14 items-center justify-center rounded-full bg-state-success shadow-lg"
             >
-              <Ionicons name="logo-whatsapp" size={22} color="#FFFFFF" />
+              <Ionicons name="logo-whatsapp" size={24} color="#FFFFFF" />
             </Touchable>
           </div>
 

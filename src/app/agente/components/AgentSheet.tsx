@@ -121,12 +121,15 @@ export default function AgentSheet({ visible, onClose, sessionId }: Props) {
   if (!visible) return null;
 
   return (
+    // Móvil: hoja que sube desde abajo a todo el ancho. Desktop (sm+): un widget de chat
+    // anclado a la esquina inferior derecha —junto al FAB— que NO cubre toda la pantalla;
+    // el fondo apenas se atenúa para seguir viendo la página detrás.
     <div
-      className="fixed inset-0 z-50 flex justify-center bg-black/45"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/30 sm:justify-end sm:p-4"
       onClick={onClose}
     >
       <div
-        className="mt-auto flex h-[88dvh] w-full max-w-[480px] flex-col overflow-hidden rounded-t-3xl bg-surface-background"
+        className="flex h-[88dvh] w-full max-w-[440px] flex-col overflow-hidden rounded-t-3xl bg-surface-background shadow-2xl sm:h-[min(640px,88dvh)] sm:rounded-3xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Handle + header */}

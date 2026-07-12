@@ -292,7 +292,7 @@ export default function MisSubcuentasPage() {
             </Touchable>
           </View>
 
-          <AgenteFab bottom={96} />
+          <AgenteFab bottom={40} />
         </>
       ) : null}
     </View>
