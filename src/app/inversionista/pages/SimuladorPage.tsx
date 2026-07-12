@@ -89,7 +89,7 @@ export default function SimuladorPage() {
       (banco === null || t.institucion === banco),
   );
 
-  const pedirRecomendacion = useCallback(async () => {
+  const pedirRecomendacion = useCallback(async (provider?: string) => {
     setCargandoIA(true);
     setErrorIA(null);
     try {
@@ -99,6 +99,7 @@ export default function SimuladorPage() {
           plazo_dias: plazo,
           todos_los_plazos: true,
           ...(seleccion ? { seleccion_code: seleccion } : {}),
+          ...(provider ? { provider } : {}),
         }),
       );
     } catch (e) {
@@ -223,7 +224,7 @@ export default function SimuladorPage() {
               cargando={cargandoIA}
               error={errorIA}
               habilitado={opciones.length > 0}
-              onPedir={() => void pedirRecomendacion()}
+              onPedir={(provider) => void pedirRecomendacion(provider)}
             />
 
             {/* Cambiar de banco o de fondo: todas las opciones, con filtros. */}
