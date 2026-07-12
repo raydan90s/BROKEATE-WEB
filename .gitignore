@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Variables de entorno: no se sube ninguna, en ninguna variante.
+# (Recordatorio: todo VITE_* termina dentro del bundle publico igualmente,
+#  asi que un secreto de verdad tampoco va en estos archivos.)
+.env
+.env.*
