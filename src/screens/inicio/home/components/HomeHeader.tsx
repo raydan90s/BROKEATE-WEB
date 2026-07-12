@@ -1,5 +1,7 @@
 import { Ionicons } from '@/components/Icono';
 import { Text, Touchable, View } from '@/components/rn';
+import BotonTema from '@/components/shared/BotonTema';
+import { useColores } from '@/context/ThemeContext';
 
 interface HomeHeaderProps {
   title: string;
@@ -14,6 +16,8 @@ export default function HomeHeader({
   actionIcon = 'settings-outline',
   onAction,
 }: HomeHeaderProps) {
+  const colores = useColores();
+
   return (
     <View className="flex-row items-center justify-between border-b border-surface-border px-5 py-4">
       <View className="flex-1 pr-3">
@@ -25,12 +29,15 @@ export default function HomeHeader({
         ) : null}
       </View>
 
-      <Touchable
-        onPress={onAction}
-        className="h-10 w-10 items-center justify-center rounded-full bg-surface-secondary"
-      >
-        <Ionicons name={actionIcon} size={20} color="#18181B" />
-      </Touchable>
+      <View className="flex-row items-center gap-2">
+        <BotonTema />
+        <Touchable
+          onPress={onAction}
+          className="h-10 w-10 items-center justify-center rounded-full bg-surface-secondary"
+        >
+          <Ionicons name={actionIcon} size={20} color={colores.textoPrimario} />
+        </Touchable>
+      </View>
     </View>
   );
 }

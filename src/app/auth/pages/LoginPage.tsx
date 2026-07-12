@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 import { Ionicons } from '@/components/Icono';
 import { ActivityIndicator, ScrollView, Text, TextInput, Touchable, View } from '@/components/rn';
+import BotonTema from '@/components/shared/BotonTema';
 import { useAuth } from '@/context/AuthContext';
 import { ApiError } from '@/services/http';
 
@@ -29,6 +30,8 @@ export default function LoginPage() {
 
   async function onSubmit() {
     if (!puedeEnviar) return;
+    const correo = email.trim().toLowerCase();
+
     setEnviando(true);
     setError(null);
     try {
@@ -36,12 +39,22 @@ export default function LoginPage() {
       // cambiar la sesión; en web las rutas son URLs y nadie nos saca de /login, así que
       // navegamos explícitamente a la casa de cada rol (o de vuelta a donde iba el asesor
       // / inversionista antes de que el guard lo mandara a login).
-      const sesion = await login({ email: email.trim(), password });
+      const sesion = await login({ email: correo, password });
       await signIn(sesion);
       const desde = (location.state as { desde?: string } | null)?.desde;
       const casa = sesion.role === 'advisor' ? '/asesor/cola' : '/';
       navigate(desde && desde !== '/login' ? desde : casa, { replace: true });
     } catch (e) {
+      // 403 = la cuenta existe y la contraseña es correcta, pero el correo nunca se
+      // verificó. El backend ya reenvió el código antes de rebotar, así que no se muestra
+      // un error muerto: se lleva al usuario a escribirlo. El chequeo del mensaje es
+      // contrato con `CORREO_SIN_VERIFICAR` del auth_controller.
+      if (e instanceof ApiError && e.statusCode === 403 && /verificad/i.test(e.message)) {
+        setEnviando(false);
+        navigate('/verificar-correo', { state: { email: correo } });
+        return;
+      }
+
       setError(
         e instanceof ApiError ? e.message : 'No se pudo iniciar sesión. Intenta de nuevo.',
       );
@@ -65,6 +78,10 @@ export default function LoginPage() {
       className="bg-surface-background"
       contentContainerClassName="grow justify-center px-6 py-8 gap-6"
     >
+      <View className="mx-auto w-full max-w-md flex-row justify-end">
+        <BotonTema />
+      </View>
+
       {/* La columna de lectura por defecto es ancha (768px); un formulario de login se ve
           mejor angosto, así que el logo y el formulario se centran en ~28rem. */}
       <View className="mx-auto w-full max-w-md items-center">
@@ -147,6 +164,16 @@ export default function LoginPage() {
               </Touchable>
             </View>
           </View>
+
+          <Touchable
+            onPress={() => navigate('/olvide-contrasena')}
+            disabled={enviando}
+            className="self-end"
+          >
+            <Text className="text-body font-bold text-brand-mid">
+              ¿Olvidaste tu contraseña?
+            </Text>
+          </Touchable>
         </View>
 
         {error ? (

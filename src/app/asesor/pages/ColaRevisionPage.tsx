@@ -4,8 +4,10 @@ import { Ionicons } from '@/components/Icono';
 import { ScrollView, Text, Touchable, View } from '@/components/rn';
 import { useFocusEffect, useNavigation } from '@/routes/navegacion';
 
+import BotonTema from '@/components/shared/BotonTema';
 import { Cargando, ErrorEstado, Vacio } from '@/components/shared/Estados';
 import { useAuth } from '@/context/AuthContext';
+import { useColores } from '@/context/ThemeContext';
 import { ApiError } from '@/services/http';
 import { fechaHora, usd } from '@/utils/formato';
 
@@ -21,6 +23,7 @@ import type { ColaItem } from '../types/asesor';
 export default function ColaRevisionPage() {
   const navigation = useNavigation();
   const { user, logout } = useAuth();
+  const colores = useColores();
 
   const [cola, setCola] = useState<ColaItem[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -55,9 +58,10 @@ export default function ColaRevisionPage() {
           <Text className="text-caption text-text-secondary">{user?.name} · Asesor</Text>
         </View>
         <View className="flex-row items-center gap-4">
+          <BotonTema />
           {/* En web no hay "pull to refresh": un botón explícito. */}
           <Touchable onPress={refrescar} accessibilityLabel="Actualizar" disabled={refrescando}>
-            <Ionicons name="refresh" size={20} color="#14375E" />
+            <Ionicons name="refresh" size={20} color={colores.primario} />
           </Touchable>
           <Touchable onPress={() => void logout()}>
             <Text className="text-body font-bold text-brand-primary">Salir</Text>
