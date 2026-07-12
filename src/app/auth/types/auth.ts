@@ -22,3 +22,20 @@ export interface RegisterPayload {
   password: string;
   cedula_ruc?: string;
 }
+
+/** Respuesta de /resend-code y /forgot-password: siempre la misma, exista o no la cuenta. */
+export interface MensajeResponse {
+  mensaje: string;
+}
+
+export interface VerificarCorreoPayload {
+  email: string;
+  /** Los 6 dígitos que llegaron al buzón. */
+  codigo: string;
+}
+
+export interface ResetPasswordPayload {
+  email: string;
+  codigo: string;
+  password: string;
+}

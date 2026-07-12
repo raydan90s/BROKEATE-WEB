@@ -7,6 +7,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Brokeate</title>
   <meta name="description" content="Robo-advisor: perfilamiento, propuesta de inversión y revisión del asesor." />
+  <script>
+    // Fija el tema ANTES del primer pintado para no ver un destello claro→oscuro al
+    // recargar. El ThemeContext toma el relevo al montar (misma clave, misma lógica).
+    (function () {
+      try {
+        var g = localStorage.getItem('@roboadvisor_tema');
+        var oscuro = g === 'dark' || (g !== 'light' &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches);
+        var raiz = document.documentElement;
+        raiz.classList.toggle('dark', oscuro);
+        raiz.style.colorScheme = oscuro ? 'dark' : 'light';
+      } catch (e) {}
+    })();
+  </script>
 </head>
 
 <body>

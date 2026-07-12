@@ -1,6 +1,9 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 
 import LoginPage from '@/app/auth/pages/LoginPage'
+import OlvideContrasenaPage from '@/app/auth/pages/OlvideContrasenaPage'
+import RestablecerContrasenaPage from '@/app/auth/pages/RestablecerContrasenaPage'
+import VerificarCorreoPage from '@/app/auth/pages/VerificarCorreoPage'
 import AuditoriaPage from '@/app/asesor/pages/AuditoriaPage'
 import ColaRevisionPage from '@/app/asesor/pages/ColaRevisionPage'
 import DetallePropuestaPage from '@/app/asesor/pages/DetallePropuestaPage'
@@ -10,12 +13,14 @@ import CuestionarioPage from '@/app/inversionista/pages/CuestionarioPage'
 import InicioPage from '@/app/inversionista/pages/InicioPage'
 import MercadosSimuladorPage from '@/app/inversionista/pages/MercadosSimuladorPage'
 import MisSubcuentasPage from '@/app/inversionista/pages/MisSubcuentasPage'
+import NoticiasPage from '@/app/inversionista/pages/NoticiasPage'
 import NuevaSubcuentaPage from '@/app/inversionista/pages/NuevaSubcuentaPage'
 import PropuestaPage from '@/app/inversionista/pages/PropuestaPage'
 import SimuladorPage from '@/app/inversionista/pages/SimuladorPage'
 import SubcuentaDetallePage from '@/app/inversionista/pages/SubcuentaDetallePage'
 import VincularWhatsAppPage from '@/app/whatsapp/pages/VincularWhatsAppPage'
 import LayoutAsesorTabs from '@/layouts/LayoutAsesorTabs'
+import LayoutInversionistaTabs from '@/layouts/LayoutInversionistaTabs'
 import LayoutSimple from '@/layouts/LayoutSimple'
 import RutaProtegida from '@/routes/RutaProtegida'
 
@@ -34,8 +39,16 @@ import RutaProtegida from '@/routes/RutaProtegida'
  */
 export const router = createBrowserRouter([
   {
+    // Auth: públicas (el guard no las cubre). El correo de los pasos 2 y 3 viaja por el
+    // `state` de la navegación, no por la URL; si se recarga la página, la propia pantalla
+    // rebota a donde corresponde (olvidé-contraseña o login).
     element: <LayoutSimple />,
-    children: [{ path: '/login', element: <LoginPage /> }],
+    children: [
+      { path: '/login', element: <LoginPage /> },
+      { path: '/olvide-contrasena', element: <OlvideContrasenaPage /> },
+      { path: '/restablecer-contrasena', element: <RestablecerContrasenaPage /> },
+      { path: '/verificar-correo', element: <VerificarCorreoPage /> },
+    ],
   },
 
   // ── Inversionista ────────────────────────────────────────────────────────────
@@ -43,9 +56,12 @@ export const router = createBrowserRouter([
     element: <RutaProtegida rol="investor" />,
     children: [
       {
-        element: <LayoutSimple />,
+        // Pestañas Inicio | Noticias. "Inicio" envuelve todo el flujo del inversionista
+        // (era un stack lineal); "Noticias" es el feed de mercado en su propia pestaña.
+        element: <LayoutInversionistaTabs />,
         children: [
           { index: true, element: <MisSubcuentasPage /> },
+          { path: '/noticias', element: <NoticiasPage /> },
           { path: '/subcuentas/nueva', element: <NuevaSubcuentaPage /> },
           { path: '/subcuentas/:sessionId', element: <SubcuentaDetallePage /> },
 
