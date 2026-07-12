@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { Ionicons } from '@/components/Icono';
-import { ScrollView, Text, View } from '@/components/rn';
+import { Text, View } from '@/components/rn';
 import { COLORES } from '@/constants/colores';
 
 import { getCotizaciones, type MarketQuote } from '../services/marketApi';
@@ -36,7 +36,7 @@ function Tarjeta({ cotizacion }: { cotizacion: MarketQuote }) {
   const color = sube ? COLORES.exito : baja ? COLORES.error : COLORES.textoMuted;
 
   return (
-    <View className="w-36 gap-1.5 rounded-2xl border border-surface-border bg-surface-background p-3.5">
+    <View className="w-36 shrink-0 gap-1.5 rounded-2xl border border-surface-border bg-surface-background p-3.5 md:w-auto">
       <View className="flex-row items-center justify-between">
         <Text className="text-caption font-bold uppercase text-text-secondary">
           {cotizacion.symbol}
@@ -72,7 +72,7 @@ function Tarjeta({ cotizacion }: { cotizacion: MarketQuote }) {
 
 function TarjetaEsqueleto() {
   return (
-    <View className="w-36 gap-2 rounded-2xl border border-surface-border bg-surface-secondary p-3.5 opacity-60">
+    <View className="w-36 shrink-0 gap-2 rounded-2xl border border-surface-border bg-surface-secondary p-3.5 opacity-60 md:w-auto">
       <View className="h-3 w-12 rounded bg-surface-divider" />
       <View className="h-3 w-20 rounded bg-surface-divider" />
       <View className="h-4 w-24 rounded bg-surface-divider" />
@@ -115,11 +115,13 @@ export default function MarketTicker() {
         <Text className="text-caption text-text-muted">Alpha Vantage · referencial</Text>
       </View>
 
-      <ScrollView horizontal contentContainerClassName="gap-2.5 px-5">
+      {/* En móvil desliza en horizontal; en pantalla ancha las cinco cotizaciones se
+          reparten en rejilla y ocupan todo el ancho, sin el hueco muerto de la derecha. */}
+      <div className="flex gap-2.5 overflow-x-auto px-5 md:grid md:grid-cols-5 md:overflow-x-visible">
         {cotizaciones
           ? cotizaciones.map((c) => <Tarjeta key={c.symbol} cotizacion={c} />)
           : Array.from({ length: 5 }).map((_, i) => <TarjetaEsqueleto key={i} />)}
-      </ScrollView>
+      </div>
     </View>
   );
 }
