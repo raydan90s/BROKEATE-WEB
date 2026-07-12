@@ -1,8 +1,12 @@
+import { useCallback, useEffect, useState } from 'react';
+
 import { Ionicons } from '@/components/Icono';
 import { ActivityIndicator, Text, Touchable, View } from '@/components/rn';
 
+import ProviderSelector from '@/app/agente/components/ProviderSelector';
 import SourceChips from '@/app/agente/components/SourceChips';
-import type { SimuladorResponse } from '@/app/agente/services/agentApi';
+import { getProviders } from '@/app/agente/services/agentApi';
+import type { ProviderInfo, SimuladorResponse } from '@/app/agente/services/agentApi';
 import { COLORES } from '@/constants/colores';
 
 interface Props {
@@ -13,7 +17,8 @@ interface Props {
   habilitado: boolean;
   /** Qué le falta al usuario para poder pedirla. Solo se ve con `habilitado` en false. */
   pista?: string;
-  onPedir: () => void;
+  /** Pide la recomendación. `provider` = el motor de IA elegido (undefined = el default). */
+  onPedir: (provider?: string) => void;
 }
 
 /**
@@ -29,6 +34,37 @@ export default function RecomendacionIA({
   pista,
   onPedir,
 }: Props) {
+  // El motor de IA con el que se (re)genera esta recomendación. Mismo patrón que el
+  // selector del chat: se puede correr la MISMA recomendación con otro motor.
+  const [providers, setProviders] = useState<ProviderInfo[]>([]);
+  const [proveedor, setProveedor] = useState<string | null>(null);
+
+  const cargarProviders = useCallback(() => {
+    getProviders()
+      .then((lista) => {
+        setProviders(lista);
+        setProveedor((actual) => {
+          if (actual && lista.some((p) => p.id === actual && p.disponible)) return actual;
+          const def =
+            lista.find((p) => p.es_default && p.disponible) ?? lista.find((p) => p.disponible);
+          return def?.id ?? null;
+        });
+      })
+      .catch(() => {
+        /* si falla, el combo no aparece y se usa el default del backend */
+      });
+  }, []);
+
+  useEffect(() => {
+    cargarProviders();
+  }, [cargarProviders]);
+
+  // Cambiar de motor RE-EJECUTA la misma recomendación con ese motor (los datos no cambian).
+  const cambiarMotor = (id: string) => {
+    setProveedor(id);
+    onPedir(id);
+  };
+
   if (cargando) {
     return (
       <View className="flex-row items-center gap-3 rounded-2xl bg-brandAlpha-primarySoft p-5">
@@ -61,7 +97,7 @@ export default function RecomendacionIA({
         ) : null}
 
         <Touchable
-          onPress={onPedir}
+          onPress={() => onPedir(proveedor ?? undefined)}
           disabled={!habilitado}
           className={`flex-row items-center justify-center gap-2 rounded-xl py-3 ${
             habilitado ? 'bg-brand-primary' : 'bg-surface-secondary'
@@ -89,12 +125,24 @@ export default function RecomendacionIA({
 
   return (
     <View className="gap-3 rounded-2xl bg-brandAlpha-primarySoft p-5">
-      <View className="flex-row items-center gap-2">
+      <View className="flex-row flex-wrap items-center gap-2">
         <Ionicons name="sparkles" size={16} color={COLORES.primario} />
         <Text className="flex-1 text-caption font-bold uppercase text-brand-primary">
           Recomendación con IA
         </Text>
-        <Touchable onPress={onPedir} className="flex-row items-center gap-1">
+        {/* Combo de motor: correr la MISMA recomendación con otro modelo de IA. */}
+        {providers.length ? (
+          <ProviderSelector
+            providers={providers}
+            value={proveedor}
+            onChange={cambiarMotor}
+            onOpen={cargarProviders}
+          />
+        ) : null}
+        <Touchable
+          onPress={() => onPedir(proveedor ?? undefined)}
+          className="flex-row items-center gap-1"
+        >
           <Ionicons name="refresh" size={13} color={COLORES.primario} />
           <Text className="text-caption font-bold text-brand-primary">Otra vez</Text>
         </Touchable>
@@ -118,7 +166,7 @@ export default function RecomendacionIA({
           {recomendacion.guardrail_passed
             ? 'Cada cifra citada existe en el catálogo: el validador del banco revisó el texto.'
             : 'El texto no pasó el validador del banco.'}
-          {esPlantilla ? ' Lo escribió el motor, no el modelo.' : ` · ${recomendacion.modelo}`}
+          {esPlantilla ? ' Lo escribió el motor, no el modelo.' : ''}
         </Text>
       </View>
     </View>

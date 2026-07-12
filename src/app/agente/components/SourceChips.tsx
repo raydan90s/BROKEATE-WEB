@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { Ionicons } from '@/components/Icono';
-import { Text, Touchable, View } from '@/components/rn';
+import { Text, Touchable, View, abrirEnlace } from '@/components/rn';
 
 import type { SourceChip } from '../services/agentApi';
 
@@ -18,9 +18,14 @@ const FUENTE: Record<string, string> = {
   instruments: 'Del catálogo de productos',
   institutions: 'Del catálogo de emisores',
   alpha_vantage: 'De Alpha Vantage (mercado externo, no es del banco)',
+  // Noticias (Ruta D): titular de un medio externo. El chip abre la nota original.
+  gnews: 'Noticia — abre la fuente',
 };
 
 const esFuenteExterna = (table: string) => table === 'alpha_vantage';
+
+// Los chips de noticia NO abren un detalle: llevan directo a la nota original.
+const esNoticia = (table: string) => table === 'gnews';
 
 export default function SourceChips({ sources }: { sources: SourceChip[] }) {
   const [abierto, setAbierto] = useState<string | null>(null);
@@ -33,10 +38,19 @@ export default function SourceChips({ sources }: { sources: SourceChip[] }) {
         {sources.map((s) => {
           const activo = abierto === s.record_id;
           const externa = esFuenteExterna(s.table);
+          const noticia = esNoticia(s.table);
+          const abrir = () => {
+            // Una noticia lleva directo a su fuente; el resto abre el detalle inline.
+            if (noticia && s.record_id.startsWith('http')) {
+              abrirEnlace(s.record_id);
+            } else {
+              setAbierto(activo ? null : s.record_id);
+            }
+          };
           return (
             <Touchable
               key={`${s.table}-${s.record_id}`}
-              onPress={() => setAbierto(activo ? null : s.record_id)}
+              onPress={abrir}
               className={`flex-row items-center gap-1 rounded-full border px-2.5 py-1 ${
                 externa
                   ? 'border-state-warning bg-stateAlpha-warningSoft'
@@ -46,7 +60,9 @@ export default function SourceChips({ sources }: { sources: SourceChip[] }) {
               }`}
             >
               <Ionicons
-                name={externa ? 'trending-up-outline' : 'document-text-outline'}
+                name={
+                  noticia ? 'open-outline' : externa ? 'trending-up-outline' : 'document-text-outline'
+                }
                 size={11}
                 color={externa ? '#C77700' : '#1E3A8A'}
               />
