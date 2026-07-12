@@ -77,7 +77,7 @@ export default function ComparadorPage() {
     setErrorIA(null);
   }, [monto, plazo]);
 
-  const pedirRecomendacion = useCallback(async () => {
+  const pedirRecomendacion = useCallback(async (provider?: string) => {
     setCargandoIA(true);
     setErrorIA(null);
     try {
@@ -86,6 +86,7 @@ export default function ComparadorPage() {
           monto,
           ...(plazo != null ? { plazo_dias: plazo } : {}),
           todos_los_plazos: false,
+          ...(provider ? { provider } : {}),
         }),
       );
     } catch (e) {
@@ -199,7 +200,7 @@ export default function ComparadorPage() {
                 ? 'No hay tasas que comparar con este filtro.'
                 : 'Escribe un monto arriba para que el asistente pueda recomendarte.'
             }
-            onPedir={() => void pedirRecomendacion()}
+            onPedir={(provider) => void pedirRecomendacion(provider)}
           />
 
           <Tarjeta className="gap-0 p-0">
