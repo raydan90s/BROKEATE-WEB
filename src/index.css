@@ -2,10 +2,72 @@
 @tailwind components;
 @tailwind utilities;
 
-/* El canvas de Brokeate (surface.canvas). El shell centra la app encima (Fase 8). */
 body {
   margin: 0;
-  background-color: #f2f5f9;
+  /* surface.canvas: el fondo sobre el que el shell centra la app (Fase 8). */
+  background-color: theme('colors.surface.canvas');
+  color: theme('colors.text.primary');
   font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+@layer components {
+  /*
+   * LA CLASE MÁS IMPORTANTE DEL PORT.
+   *
+   * En React Native un <View> es `display:flex; flex-direction:column` por defecto; un
+   * <div> de HTML es `display:block`. Si no se replica eso, cada `gap-2` / `items-center`
+   * de las 40 pantallas copiadas deja de aplicar y todo se ve apilado y sin espacios.
+   *
+   * Va en @layer components para que las utilidades de Tailwind de cada pantalla
+   * (`flex-row`, `items-start`…) ganen sobre estos valores base. Es la misma hoja de
+   * estilos base que aplica react-native-web a su View.
+   */
+  .rn-vista {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    /* RN no encoge los hijos por defecto; CSS sí (flex-shrink:1). Sin esto, el texto
+       largo aplasta a sus hermanos y aparecen bugs de layout difíciles de rastrear. */
+    flex-shrink: 0;
+    /* Y sin estos dos, un hijo con texto largo desborda su contenedor flex. */
+    min-width: 0;
+    min-height: 0;
+    position: relative;
+    box-sizing: border-box;
+  }
+
+  /* TouchableOpacity → <button>. El navegador centra y centra-alinea los botones; RN no. */
+  .rn-tactil {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    text-align: left;
+    cursor: pointer;
+    background: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    box-sizing: border-box;
+  }
+  .rn-tactil:disabled {
+    cursor: not-allowed;
+  }
+
+  /* El reemplazo de <ActivityIndicator>. El color se pasa con `border-top-color` desde
+     el componente, no se fija acá. */
+  .spinner {
+    display: inline-block;
+    border-radius: 9999px;
+    border-style: solid;
+    border-color: theme('colors.surface.border');
+    animation: spinner-giro 0.7s linear infinite;
+  }
+}
+
+@keyframes spinner-giro {
+  to {
+    transform: rotate(360deg);
+  }
 }

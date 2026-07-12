@@ -1,6 +1,17 @@
 # Plan: portar el front de RoboAdvisorApp a web (Vite + React DOM)
 
-Estado: **propuesto, sin ejecutar.** Escrito el 11-jul-2026.
+Escrito el 11-jul-2026. **Fases 1–4 ejecutadas y verificadas.** Siguiente: Fase 5.
+
+| Fase | Estado |
+|---|---|
+| 1 · Andamiaje | ✅ hecha — `npm run build` pasa |
+| 2 · Colores | ✅ hecha — tokens verificados en el CSS del build |
+| 3 · TypeScript puro + servicios | ✅ hecha — 1.102 líneas; el backend responde |
+| 4 · Router | ✅ hecha — 14 rutas + guard por rol; login real contra el backend |
+| 5 · Primitivas | ✅ hecha — 10 primitivas; cascada verificada |
+| 6 · Componentes compartidos | ⬜ siguiente (1 de 10 ya portado) |
+| 7 · Pantallas | ⬜ |
+| 8 · Shell + despliegue | ⬜ |
 
 Origen: `d:\GitHub\RoboAdvisorApp` (Expo SDK 54 · React Native 0.81 · NativeWind ·
 React Navigation).
@@ -44,19 +55,23 @@ capacidad que el navegador no tenga.
 
 ---
 
-## Fase 1 — Andamiaje (≈30 min)
+## Fase 1 — Andamiaje ✅ (hecha en ~25 min)
 
-Este repo es el scaffold por defecto de Vite (`src/App.tsx` es el contador con los logos).
-Se vacía y se instalan las cuatro piezas que faltan:
+Este repo era el scaffold por defecto de Vite (`src/App.tsx` era el contador con los logos).
+Se vació y se instalaron las piezas que faltaban:
 
 ```bash
 cd d:/GitHub/brokeate
 npm i react-router-dom react-icons
 npm i -D tailwindcss@3 postcss autoprefixer
-npx tailwindcss init -p
 ```
 
-Decisiones que ya están tomadas, para no re-discutirlas a mitad del port:
+> ⚠️ **`npx tailwindcss init -p` NO se usó, a propósito.** El `package.json` declara
+> `"type": "module"`, y ese comando escribe `tailwind.config.js` y `postcss.config.js`
+> con `module.exports` (CommonJS) → el build revienta. Ambos configs se escribieron a
+> mano con `export default`. Si alguien vuelve a correr `init -p`, romperá el repo.
+
+Decisiones tomadas, para no re-discutirlas a mitad del port:
 
 - **Tailwind 3, no 4.** El `tailwind.config.js` de RoboAdvisorApp es v3 y se copia tal
   cual (ver Fase 2). Subir a v4 obligaría a reescribir los tokens a `@theme` y no
@@ -71,48 +86,84 @@ Decisiones que ya están tomadas, para no re-discutirlas a mitad del port:
 - Se borran `src/App.css`, `src/assets/*`, `public/icons.svg` y el contenido de
   `src/index.css` (queda solo con las directivas de Tailwind).
 
-Se añade el alias `@` → `src`, porque **todos** los imports de RoboAdvisorApp lo usan
-(`@/components/shared/Boton`). Sin esto, cada archivo copiado hay que reescribirlo:
+Se añadió el alias `@` → `src`, porque **todos** los imports de RoboAdvisorApp lo usan
+(`@/components/shared/Boton`). Sin esto, cada archivo copiado habría que reescribirlo.
+Son **dos** configuraciones distintas y hay que tocar las dos (es clásico que una resuelva
+y la otra no; se verificó compilando un import real):
 
 ```ts
 // vite.config.ts
-import path from 'node:path'
-// ...
-resolve: { alias: { '@': path.resolve(__dirname, './src') } }
+resolve: { alias: { '@': path.resolve(import.meta.dirname, './src') } }
 ```
 
-Y en `tsconfig.app.json`: `"baseUrl": ".", "paths": { "@/*": ["src/*"] }`.
+```jsonc
+// tsconfig.app.json  ── sin baseUrl:
+"paths": { "@/*": ["./src/*"] }
+```
+
+> ⚠️ **`baseUrl` no se puede usar.** El repo va con TypeScript 6, que lo deprecó: el build
+> falla con `TS5101`. No hace falta — desde TS 5.5 los `paths` resuelven relativo al propio
+> tsconfig.
+
+**Entorno.** El backend ya está desplegado, así que la web funciona sin levantar Python
+en local:
+
+```
+VITE_API_BASE_URL=https://hackaton.api.alata-ec.com
+VITE_WHATSAPP_NUMERO=+12566808498
+```
+
+> ⚠️ **Ningún `.env*` se versiona** (`.gitignore`: `.env` y `.env.*`). Consecuencia para la
+> Fase 8: **hay que declarar `VITE_API_BASE_URL` a mano en el dashboard de Vercel.** Si se
+> olvida, `BASE_URL` queda en `''`, las llamadas pegan contra el dominio de Vercel en vez
+> del backend, y el síntoma es feo y silencioso: la app carga y el login da error de red.
+
+**Deuda conocida:** `tsconfig.app.json` no tiene `strict`, pero sí `noUnusedLocals` y
+`noUnusedParameters`. Lo segundo va a ladrar al portar pantallas (imports de RN que quedan
+sin uso). Se decidió no relajarlo por ahora.
 
 ---
 
-## Fase 2 — Los colores (≈15 min)
+## Fase 2 — Los colores ✅ (hecha en ~15 min)
 
-Es literalmente un copy-paste de dos archivos, y es todo lo que hace falta para que la
-identidad visual sea idéntica:
+Fue el copy-paste que prometía, y con eso la identidad visual ya es idéntica:
 
-1. `RoboAdvisorApp/tailwind.config.js` → aquí. Se le quitan **dos líneas**:
-   - `presets: [require('nativewind/preset')]` (fuera: eso es lo que hacía funcionar
-     `className` en RN)
-   - se ajusta `content` a `['./index.html', './src/**/*.{ts,tsx}']`
+1. `RoboAdvisorApp/tailwind.config.js` → [`tailwind.config.js`](./tailwind.config.js), con
+   **tres** cambios y ninguno más:
+   - `export default` en vez de `module.exports` (el `"type": "module"` de arriba)
+   - fuera `presets: [require('nativewind/preset')]` — eso era lo que hacía funcionar
+     `className` en RN; en web Tailwind emite CSS de verdad
+   - `content: ['./index.html', './src/**/*.{ts,tsx}']`
 
    Todo lo demás —`brand.primary #14375E`, `brand.ink #0A2540`, `state.success #1B8A5A`,
-   `surface.border #E8EBF0`, `perfil.*`, la escala tipográfica `caption`…`hero`— entra
-   sin tocar. Los `className` de las 40 pantallas siguen resolviendo a los mismos hex.
+   `surface.border #E8EBF0`, `perfil.*`, la escala `caption`…`hero`— entró sin tocar.
 
-2. `src/constants/colores.ts` → aquí, **idéntico**. Es TS puro y lo consumen el donut y
-   los íconos.
+2. `src/constants/colores.ts` → [aquí](./src/constants/colores.ts), **byte por byte
+   idéntico** (`diff` limpio). Lo consumen el donut y los íconos, que no aceptan `className`.
 
-3. `src/index.css` queda con las tres directivas de `global.css` (`@tailwind base;
-   components; utilities;`) más el spinner y el `body { background: #F2F5F9 }`.
+3. [`src/index.css`](./src/index.css): las tres directivas de Tailwind, el canvas
+   `#F2F5F9` en el `body`, y la clase `.spinner` (keyframes CSS) que reemplazará al
+   `ActivityIndicator` en la Fase 5.
 
-> El único riesgo de color: NativeWind y Tailwind web difieren en `gap` dentro de
+**Verificado, no supuesto:** se extrajeron los colores del CSS del build y cada token sale
+con su valor correcto — `brand.primary` → `20 55 94`, `brand.ink` → `10 37 64`,
+`state.success` → `27 138 90`, `state.error` → `192 54 44`, `surface.border` →
+`232 235 240`; y la escala tipográfica en 12/14/16/26px.
+
+> ⚠️ **Los hex no aparecen como hex en el CSS.** Tailwind v3 los compila a
+> `rgb(20 55 94 / var(--tw-bg-opacity))` para poder aplicar opacidades. Buscar `#14375E`
+> en `dist/assets/*.css` da cero y parece roto — no lo está. Y un token que no use ninguna
+> pantalla sencillamente no se emite: el JIT solo genera las clases usadas.
+
+> Riesgo residual de color: NativeWind y Tailwind web difieren en `gap` dentro de
 > `flex-row`. En web funciona igual o mejor, no peor.
 
 ---
 
-## Fase 3 — Copiar el TypeScript puro (≈30 min)
+## Fase 3 — Copiar el TypeScript puro ✅ (hecha en ~30 min)
 
-Estos 1.104 líneas se mueven **sin abrirlas**, con dos excepciones marcadas:
+Se movieron **1.102 líneas** prácticamente sin abrirlas. Cumplió lo prometido: al terminar,
+todo el contrato con el backend Python está portado sin haber escrito lógica nueva.
 
 ```
 src/constants/colores.ts          ← tal cual
@@ -154,17 +205,63 @@ export async function deleteToken() { localStorage.removeItem(TOKEN_KEY); }
 por `localStorage`. La lógica (`signIn`, `logout`, el `isLoading` que evita el parpadeo del
 login) queda intacta.
 
-Al terminar esta fase, **todo el contrato con el backend Python ya está portado.** Los 21
-endpoints (`/api/auth/login`, `/api/investor/profile`, `/api/investor/{id}/portfolio`,
-`/api/advisor/queue`, `/api/agent/chat`…) funcionan sin haber escrito una línea nueva.
+### Lo que apareció al ejecutarla
+
+> ⚠️ **`erasableSyntaxOnly` prohíbe las *parameter properties* de TypeScript.** El
+> tsconfig de este repo (plantilla de Vite) la trae activada, y el `constructor(message,
+> public statusCode, public data)` de `ApiError` en `http.ts` **no compila**. Se
+> reescribió con campos declarados a mano. Fue el **único** archivo copiado que dio error
+> de tipos. Si más adelante algo copiado usa `enum`, chocará con lo mismo.
+
+> ✅ **CORS ya no es un riesgo.** Se comprobó con `curl` contra
+> `hackaton.api.alata-ec.com`: responde `access-control-allow-origin: *` y refleja los
+> headers pedidos, incluido `authorization`. O sea que el backend acepta al navegador
+> desde `localhost` y aceptará el dominio de Vercel **sin tocar Python**. Esto tacha uno
+> de los dos avisos de la Fase 8.
+
+Detalles menores que costaron un typecheck: apareció un `marketApi.ts` que no estaba en el
+inventario original (se copió igual), `getTasas()` devuelve un `CatalogoTasas` (objeto con
+`.tasas`, no un array) y el campo de `Pregunta` es `text`, no `texto`.
+
+**Estado real:** los 21 endpoints (`/api/auth/login`, `/api/investor/profile`,
+`/api/investor/{id}/portfolio`, `/api/advisor/queue`, `/api/agent/chat`…) están portados.
+`src/App.tsx` es hoy una prueba de humo que llama a dos de ellos: `/api/investor/questions`
+(público → trae las preguntas) y `/api/catalog/rates` (exige token → devuelve el `detail` de
+FastAPI, lo que demuestra que el parseo de errores de `ApiError` sobrevivió al port).
 
 ---
 
-## Fase 4 — Navegación: React Navigation → React Router (≈2 h)
+## Fase 4 — Navegación: React Navigation → React Router ✅ (hecha en ~1,5 h)
 
-Es el único cambio *arquitectónico* del port. Hoy `RootNavigator.tsx` monta un árbol
-distinto según el rol y las pantallas navegan con `navigation.navigate('Propuesta')` y
-leen params con `route.params`.
+Era el único cambio *arquitectónico* del port. En RN, `RootNavigator.tsx` montaba un árbol
+distinto según el rol y las pantallas navegaban con `navigation.navigate('Propuesta')`,
+leyendo params con `route.params`.
+
+**Lo que quedó** (React Router 7, `createBrowserRouter`):
+
+| Archivo | Qué es |
+|---|---|
+| [`src/routes/rutas.tsx`](./src/routes/rutas.tsx) | Las 14 rutas. Reemplaza a `types/navigation.ts`. |
+| [`src/routes/RutaProtegida.tsx`](./src/routes/RutaProtegida.tsx) | El guard por rol. Reemplaza al `if (role === 'advisor')` de `RootNavigator`. |
+| [`src/layouts/Shell.tsx`](./src/layouts/Shell.tsx) | Contenedor centrado `max-w-[480px]` sobre el canvas (adelanta la Fase 8). |
+| [`src/layouts/LayoutSimple.tsx`](./src/layouts/LayoutSimple.tsx) | Shell sin barra: login, flujo del inversionista y **el detalle del asesor**. |
+| [`src/layouts/LayoutAsesorTabs.tsx`](./src/layouts/LayoutAsesorTabs.tsx) | Las dos pestañas del asesor (cola / auditoría). |
+| [`src/components/EnConstruccion.tsx`](./src/components/EnConstruccion.tsx) | Placeholder: cada una de las 13 pantallas se sustituye aquí en la Fase 7. |
+| `src/app/auth/pages/LoginPage.tsx` | Login **mínimo pero real** (llama a `/api/auth/login`). Se reemplaza por el port de las 219 líneas en la Fase 7. |
+
+> ⚠️ **`/asesor/propuesta/:id` NO cuelga de `LayoutAsesorTabs`,** y no es un descuido. En
+> RN el detalle se apilaba encima de los tabs a propósito: mientras el asesor decide, la
+> barra no está para que se distraiga y deje la decisión a medias. Si alguien "arregla"
+> esto metiéndolo bajo las pestañas, rompe esa decisión de producto.
+
+> 🔎 **Los params ahora son visibles y editables** (`/subcuentas/:sessionId`,
+> `/asesor/propuesta/:proposalId`). No es un agujero nuevo: nunca fueron un permiso — el
+> backend siempre verificó contra el token que el recurso fuera del usuario. El guard es
+> **navegación, no seguridad**.
+
+**Verificación:** login real contra `hackaton.api.alata-ec.com` con las cuentas sembradas
+(`inversionista@demo.ec` / `asesor@demo.ec`, password `demo1234`, ver `seed.sql`). El
+backend devuelve `role`, y el guard manda a cada uno a su árbol.
 
 **Mapeo:**
 
@@ -214,7 +311,49 @@ el `router` de `createBrowserRouter`.
 
 ---
 
-## Fase 5 — Primitivas (≈1 h, y ahorra las 20 h siguientes)
+## Fase 5 — Primitivas ✅ (hecha en ~1 h)
+
+**Resultado:** [`src/components/rn/index.tsx`](./src/components/rn/index.tsx) con 10
+primitivas — `View`, `Text`, `ScrollView`, `Touchable` (+ alias `Pressable`),
+`ActivityIndicator`, `SafeArea`, `TextInput`, `Modal` y el ayudante `abrirEnlace`
+(`Linking.openURL`). Las clases base `.rn-vista` y `.rn-tactil` viven en `index.css`.
+
+Traducciones que evitan tocar las pantallas una por una:
+
+| React Native | Primitiva | Nota |
+|---|---|---|
+| `onPress` | `onPress` | se conserva el nombre |
+| `onChangeText(texto)` | igual | el DOM da el evento; se desenvuelve dentro |
+| `numberOfLines={2}` | igual | → `line-clamp-2` |
+| `activeOpacity`, `hitSlop` | se aceptan y se ignoran | en web los cubre `:hover` |
+| `keyboardType="decimal-pad"` | igual | → `inputMode="decimal"` |
+| `contentContainerStyle` | `contentContainerClassName` | el ScrollView mantiene los **dos** divs |
+
+**La claim del plan se cumplió:** portar `Boton.tsx` (36 líneas) fue cambiar el import,
+`TouchableOpacity` → `Touchable` y borrar `activeOpacity`. Nada más. Ya está en
+[`src/components/shared/Boton.tsx`](./src/components/shared/Boton.tsx) y se renderiza en
+las pantallas placeholder.
+
+### Dos trampas encontradas al ejecutar
+
+> ⚠️ **Nunca construyas clases de Tailwind con plantillas.** El primer borrador usaba
+> `` `line-clamp-${numberOfLines}` ``: el JIT escanea el código **como texto**, así que una
+> clase que solo existe en tiempo de ejecución jamás llega al CSS. Falla en silencio — el
+> recorte simplemente no ocurre. Se cambió por un mapa con las clases escritas enteras.
+
+> ⚠️ **`TextInput` no usa `type="number"`,** aunque `keyboardType` sea numérico. `type=number`
+> bloquea la coma decimal ecuatoriana con la que trabajan `montoConSeparadores` y
+> `montoANumero`. Va `type="text"` + `inputMode="numeric"`: teclado numérico en móvil, coma
+> permitida.
+
+**Verificado:** `.rn-vista` compila a `display:flex; flex-direction:column; flex-shrink:0;
+min-width:0; min-height:0` y —lo que de verdad importaba— las utilidades de Tailwind salen
+**después** en el CSS (byte 5130 vs 3612), así que un `<View className="flex-row">` de
+cualquier pantalla portada se pone en fila y no en columna.
+
+---
+
+### Diseño original (referencia)
 
 Antes de tocar una sola pantalla, se crean 6 componentes en `src/components/rn/`. **No es
 un port de `react-native-web`**: son wrappers HTML que aceptan `className` y ya, de modo que
@@ -338,25 +477,32 @@ Despliegue en Vercel: `vite build` → `dist/`. Hace falta el rewrite de SPA (ig
 { "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }] }
 ```
 
-Y `VITE_API_BASE_URL` como variable de entorno en Vercel. **CORS:** el backend FastAPI tiene
-que permitir el origen nuevo de Vercel — es lo único que hay que tocar del lado de Python, y
-es una línea en su `CORSMiddleware`.
+Dos cosas más, y son las dos que se olvidan siempre:
+
+- ⚠️ **`VITE_API_BASE_URL` hay que crearla a mano en el dashboard de Vercel.** Ningún `.env*`
+  se versiona (ver Fase 1), así que el build de Vercel no la hereda del repo.
+- ✅ **CORS: ya verificado en la Fase 3, no hay nada que hacer.** El backend responde
+  `access-control-allow-origin: *` y refleja `authorization` en el preflight. No hay que
+  tocar Python.
 
 ---
 
 ## Presupuesto y realidad
 
-| Fase | Estimado |
-|---|---|
-| 1 · Andamiaje | 0,5 h |
-| 2 · Colores | 0,25 h |
-| 3 · TS puro + servicios | 0,5 h |
-| 4 · Router | 2 h |
-| 5 · Primitivas | 1 h |
-| 6 · Compartidos | 2 h |
-| 7 · Pantallas | 12–16 h |
-| 8 · Shell + deploy | 1 h |
-| **Total** | **≈20–24 h** |
+| Fase | Estimado | Real |
+|---|---|---|
+| 1 · Andamiaje | 0,5 h | ✅ ~0,4 h |
+| 2 · Colores | 0,25 h | ✅ ~0,25 h |
+| 3 · TS puro + servicios | 0,5 h | ✅ ~0,5 h |
+| 4 · Router | 2 h | ✅ ~1,5 h |
+| 5 · Primitivas | 1 h | ✅ ~1 h |
+| 6 · Compartidos | 2 h | ⬜ |
+| 7 · Pantallas | 12–16 h | ⬜ |
+| 8 · Shell + deploy | 1 h | ⬜ |
+| **Restante** | **≈19–23 h** | |
+
+Las dos fases hechas salieron en tiempo. Eso **no** es evidencia de que la Fase 7 vaya a
+salir en tiempo: 1 y 2 son configuración, la 7 son 6.163 líneas.
 
 **Contra el deadline del hackathon (domingo 12-jul-2026, 23:59) esto no cabe completo.**
 Las fases 1–6 son ~6 h y son las de menor riesgo; la 7 es la que no entra entera. Dos
