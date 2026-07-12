@@ -9,8 +9,8 @@
     "skipLibCheck": true,
 
     /* Bundler mode */
-    "baseUrl": ".",
-    "paths": { "@/*": ["src/*"] },
+    /* Sin `baseUrl`: TS 6 lo deprecó y `paths` ya resuelve relativo a este tsconfig. */
+    "paths": { "@/*": ["./src/*"] },
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
