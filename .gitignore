@@ -27,4 +27,4 @@ dist-ssr
 # (Recordatorio: todo VITE_* termina dentro del bundle publico igualmente,
 #  asi que un secreto de verdad tampoco va en estos archivos.)
 .env
-.env.*
+.env
