@@ -190,7 +190,10 @@ export default function AuditoriaPage() {
       ) : decisiones.length === 0 ? (
         <Vacio titulo="Todavía no se ha decidido ninguna propuesta" />
       ) : (
-        <ScrollView className="bg-surface-canvas" contentContainerClassName="px-5 py-5 gap-3">
+        <ScrollView
+          className="bg-surface-canvas"
+          contentContainerClassName="px-5 py-5 gap-3 max-w-5xl"
+        >
           <Text className="text-caption text-text-muted">
             {filtrando
               ? `${filtrados.length} de ${decisiones.length} decisiones`
@@ -216,7 +219,9 @@ export default function AuditoriaPage() {
               </Touchable>
             </View>
           ) : (
-            filtrados.map((evento) => {
+            // En pantalla ancha las decisiones se reparten en dos columnas.
+            <View className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            {filtrados.map((evento) => {
               const k = clave(evento);
               const version = evento.metadata?.rules_version;
 
@@ -250,7 +255,8 @@ export default function AuditoriaPage() {
                   <Ionicons name="chevron-forward" size={18} color="#A1A1AA" />
                 </Touchable>
               );
-            })
+            })}
+            </View>
           )}
 
           <View className="h-4" />

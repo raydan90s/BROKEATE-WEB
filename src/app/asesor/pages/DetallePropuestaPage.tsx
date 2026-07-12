@@ -146,7 +146,10 @@ export default function DetallePropuestaPage() {
         </Text>
       </View>
 
-      <ScrollView className="bg-surface-canvas" contentContainerClassName="px-5 py-6 gap-4">
+      <ScrollView
+        className="bg-surface-canvas"
+        contentContainerClassName="px-5 py-6 gap-4 max-w-4xl"
+      >
         {/* Ficha del cliente */}
         <View className="gap-3 rounded-2xl border border-surface-border bg-surface-background p-5">
           <View className="flex-row items-start justify-between gap-3">
@@ -212,7 +215,10 @@ export default function DetallePropuestaPage() {
         </Text>
 
         {!editando
-          ? detalle.allocations.map((linea) => (
+          ? (
+              // En pantalla ancha la asignación se reparte en dos columnas.
+              <View className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {detalle.allocations.map((linea) => (
               <View
                 key={linea.instrumento_code}
                 className="gap-3 rounded-2xl border border-surface-border bg-surface-background p-5"
@@ -243,7 +249,9 @@ export default function DetallePropuestaPage() {
                   </Text>
                 </View>
               </View>
-            ))
+                ))}
+              </View>
+            )
           : lineasEdicion.map((linea) => (
               <View
                 key={linea.code}

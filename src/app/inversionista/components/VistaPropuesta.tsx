@@ -217,7 +217,10 @@ export default function VistaPropuesta({ sessionId, titulo = 'Tu propuesta' }: P
         </Text>
       </View>
 
-      <ScrollView className="bg-surface-canvas" contentContainerClassName="px-5 py-6 gap-4">
+      <ScrollView
+        className="bg-surface-canvas"
+        contentContainerClassName="px-5 py-6 gap-4 max-w-4xl"
+      >
         {/* HU2-3: fijo, no descartable. */}
         <DisclaimerBanner />
 
@@ -269,13 +272,16 @@ export default function VistaPropuesta({ sessionId, titulo = 'Tu propuesta' }: P
         </View>
 
         {!editando ? (
-          propuesta.allocations.map((linea, i) => (
-            <TarjetaProducto
-              key={linea.instrumento_code}
-              linea={linea}
-              color={COLORES_DONUT[i % COLORES_DONUT.length]}
-            />
-          ))
+          // En pantalla ancha los productos van en dos columnas.
+          <View className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {propuesta.allocations.map((linea, i) => (
+              <TarjetaProducto
+                key={linea.instrumento_code}
+                linea={linea}
+                color={COLORES_DONUT[i % COLORES_DONUT.length]}
+              />
+            ))}
+          </View>
         ) : (
           <>
             {lineas.map((linea) => (
