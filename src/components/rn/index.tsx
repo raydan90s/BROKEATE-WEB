@@ -81,9 +81,15 @@ export function ScrollView({
       </div>
     )
   }
+  // En web el marco (Shell) es ancho; el contenido NO se estira a todo el marco: se centra
+  // en una columna de lectura (`mx-auto max-w-3xl`) para que el texto no cruce media pantalla.
+  // Una pantalla que quiera una columna más ancha (listas, detalle) solo tiene que anexar un
+  // `max-w-*` mayor a su `contentContainerClassName`: la utilidad más grande de Tailwind gana.
   return (
     <div className={`flex-1 overflow-y-auto ${className}`}>
-      <div className={`rn-vista ${contentContainerClassName}`}>{children}</div>
+      <div className={`rn-vista mx-auto w-full max-w-3xl ${contentContainerClassName}`}>
+        {children}
+      </div>
     </div>
   )
 }

@@ -75,13 +75,18 @@ export default function ColaRevisionPage() {
           detalle="Cuando un cliente se perfile, su propuesta aparecerá acá para tu revisión."
         />
       ) : (
-        <ScrollView className="bg-surface-canvas" contentContainerClassName="px-5 py-6 gap-4">
+        <ScrollView
+          className="bg-surface-canvas"
+          contentContainerClassName="px-5 py-6 gap-4 max-w-6xl"
+        >
           <Text className="text-body text-text-secondary">
             {cola.length} propuesta{cola.length > 1 ? 's' : ''} esperando tu decisión. Ninguna
             se ejecuta hasta que la apruebes.
           </Text>
 
-          {cola.map((item) => (
+          {/* En pantalla ancha la cola se reparte en columnas en vez de una tarjeta por fila. */}
+          <View className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {cola.map((item) => (
             <Touchable
               key={item.proposal_id}
               onPress={() =>
@@ -118,7 +123,8 @@ export default function ColaRevisionPage() {
                 {usd(item.monto_total)}
               </Text>
             </Touchable>
-          ))}
+            ))}
+          </View>
         </ScrollView>
       )}
     </View>

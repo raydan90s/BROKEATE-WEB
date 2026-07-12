@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { Ionicons } from '@/components/Icono';
 import { ActivityIndicator, ScrollView, Text, TextInput, Touchable, View } from '@/components/rn';
@@ -14,6 +15,8 @@ type Campo = 'email' | 'password';
 
 export default function LoginPage() {
   const { signIn } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -29,9 +32,15 @@ export default function LoginPage() {
     setEnviando(true);
     setError(null);
     try {
-      // El rol viene en la respuesta: el guard reacciona solo y monta el árbol del
-      // inversionista o el del asesor (main.tsx re-renderiza al cambiar la sesión).
-      await signIn(await login({ email: email.trim(), password }));
+      // El rol viene en la respuesta. En React Native el árbol se remontaba solo al
+      // cambiar la sesión; en web las rutas son URLs y nadie nos saca de /login, así que
+      // navegamos explícitamente a la casa de cada rol (o de vuelta a donde iba el asesor
+      // / inversionista antes de que el guard lo mandara a login).
+      const sesion = await login({ email: email.trim(), password });
+      await signIn(sesion);
+      const desde = (location.state as { desde?: string } | null)?.desde;
+      const casa = sesion.role === 'advisor' ? '/asesor/cola' : '/';
+      navigate(desde && desde !== '/login' ? desde : casa, { replace: true });
     } catch (e) {
       setError(
         e instanceof ApiError ? e.message : 'No se pudo iniciar sesión. Intenta de nuevo.',
@@ -56,11 +65,13 @@ export default function LoginPage() {
       className="bg-surface-background"
       contentContainerClassName="grow justify-center px-6 py-8 gap-6"
     >
-      <View className="items-center">
+      {/* La columna de lectura por defecto es ancha (768px); un formulario de login se ve
+          mejor angosto, así que el logo y el formulario se centran en ~28rem. */}
+      <View className="mx-auto w-full max-w-md items-center">
         <img src={logo} alt="Brokeate" className="h-56 w-56 object-contain" />
       </View>
 
-      <View className="gap-5">
+      <View className="mx-auto w-full max-w-md gap-5">
         <View className="gap-1">
           <Text className="text-display font-bold text-text-primary">Inicia sesión</Text>
           <Text className="text-body text-text-secondary">

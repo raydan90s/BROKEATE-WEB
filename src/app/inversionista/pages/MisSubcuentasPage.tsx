@@ -188,7 +188,7 @@ export default function MisSubcuentasPage() {
         <>
           <ScrollView
             className="bg-surface-canvas"
-            contentContainerClassName="px-5 py-6 gap-4"
+            contentContainerClassName="px-5 py-6 gap-4 max-w-6xl"
           >
             {/* -mx-5 cancela el padding: el ticker desliza de borde a borde. */}
             <View className="-mx-5">
@@ -259,18 +259,21 @@ export default function MisSubcuentasPage() {
                 </Text>
               </View>
             ) : (
-              resumen.subcuentas.map((subcuenta) => (
-                <TarjetaSubcuenta
-                  key={subcuenta.session_id}
-                  subcuenta={subcuenta}
-                  onPress={() =>
-                    navigation.navigate('SubcuentaDetalle', {
-                      sessionId: subcuenta.session_id,
-                      nombre: subcuenta.nombre,
-                    })
-                  }
-                />
-              ))
+              // En pantalla ancha las subcuentas se reparten en rejilla en vez de apilarse.
+              <View className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {resumen.subcuentas.map((subcuenta) => (
+                  <TarjetaSubcuenta
+                    key={subcuenta.session_id}
+                    subcuenta={subcuenta}
+                    onPress={() =>
+                      navigation.navigate('SubcuentaDetalle', {
+                        sessionId: subcuenta.session_id,
+                        nombre: subcuenta.nombre,
+                      })
+                    }
+                  />
+                ))}
+              </View>
             )}
 
             <DisclaimerBanner />
@@ -280,7 +283,7 @@ export default function MisSubcuentasPage() {
           <View className="border-t border-surface-border bg-surface-background px-5 py-4">
             <Touchable
               onPress={() => navigation.navigate('NuevaSubcuenta')}
-              className="flex-row items-center justify-center gap-2 rounded-2xl bg-brand-primary py-4"
+              className="mx-auto w-full max-w-6xl flex-row items-center justify-center gap-2 rounded-2xl bg-brand-primary py-4"
             >
               <Ionicons name="add" size={20} color="#FFFFFF" />
               <Text className="text-body-md font-bold text-text-onPrimary">
