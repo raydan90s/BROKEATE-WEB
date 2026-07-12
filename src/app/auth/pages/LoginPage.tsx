@@ -211,6 +211,13 @@ export default function LoginPage() {
             </>
           )}
         </Touchable>
+
+        <View className="flex-row justify-center gap-1">
+          <Text className="text-body text-text-secondary">¿No tienes cuenta?</Text>
+          <Touchable onPress={() => navigate('/registro')} disabled={enviando}>
+            <Text className="text-body font-bold text-brand-mid">Regístrate</Text>
+          </Touchable>
+        </View>
       </View>
 
       <Text className="text-center text-caption text-text-muted">

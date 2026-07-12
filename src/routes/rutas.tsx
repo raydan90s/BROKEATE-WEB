@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom'
 
 import LoginPage from '@/app/auth/pages/LoginPage'
 import OlvideContrasenaPage from '@/app/auth/pages/OlvideContrasenaPage'
+import RegistroPage from '@/app/auth/pages/RegistroPage'
 import RestablecerContrasenaPage from '@/app/auth/pages/RestablecerContrasenaPage'
 import VerificarCorreoPage from '@/app/auth/pages/VerificarCorreoPage'
 import AuditoriaPage from '@/app/asesor/pages/AuditoriaPage'
@@ -45,6 +46,7 @@ export const router = createBrowserRouter([
     element: <LayoutSimple />,
     children: [
       { path: '/login', element: <LoginPage /> },
+      { path: '/registro', element: <RegistroPage /> },
       { path: '/olvide-contrasena', element: <OlvideContrasenaPage /> },
       { path: '/restablecer-contrasena', element: <RestablecerContrasenaPage /> },
       { path: '/verificar-correo', element: <VerificarCorreoPage /> },
