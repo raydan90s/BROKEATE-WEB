@@ -1,107 +1,182 @@
-import { useState } from 'react'
-import { Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { useState } from 'react';
 
-import { login } from '@/app/auth/services/authApi'
-import { useAuth } from '@/context/AuthContext'
+import { Ionicons } from '@/components/Icono';
+import { ActivityIndicator, ScrollView, Text, TextInput, Touchable, View } from '@/components/rn';
+import { useAuth } from '@/context/AuthContext';
+import { ApiError } from '@/services/http';
 
-/**
- * Login mínimo de la Fase 4. **No es el port de LoginPage** (219 líneas, con registro):
- * eso llega en la Fase 7. Existe para que el guard por rol sea verificable — sin poder
- * autenticarse de verdad, las rutas protegidas no se pueden probar.
- */
+import { login } from '../services/authApi';
+
+// El logo vive en public/, así que se referencia por su ruta pública (no se importa).
+const logo = '/logo.png';
+
+type Campo = 'email' | 'password';
+
 export default function LoginPage() {
-  const { token, role, signIn } = useAuth()
-  const navigate = useNavigate()
-  const location = useLocation() as { state?: { desde?: string } }
+  const { signIn } = useAuth();
 
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const [cargando, setCargando] = useState(false)
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [verPassword, setVerPassword] = useState(false);
+  const [enfocado, setEnfocado] = useState<Campo | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [enviando, setEnviando] = useState(false);
 
-  // Ya logueado: no tiene sentido ver el login. Cada rol a su casa.
-  if (token && role) {
-    const destino = location.state?.desde ?? (role === 'advisor' ? '/asesor/cola' : '/')
-    return <Navigate to={destino} replace />
-  }
+  const puedeEnviar = email.trim().length > 0 && password.length > 0 && !enviando;
 
-  async function enviar(e: React.FormEvent) {
-    e.preventDefault()
-    setError(null)
-    setCargando(true)
+  async function onSubmit() {
+    if (!puedeEnviar) return;
+    setEnviando(true);
+    setError(null);
     try {
-      const respuesta = await login({ email, password })
-      await signIn(respuesta)
-      navigate(respuesta.role === 'advisor' ? '/asesor/cola' : '/', { replace: true })
-    } catch (err) {
-      setError((err as Error).message)
-    } finally {
-      setCargando(false)
+      // El rol viene en la respuesta: el guard reacciona solo y monta el árbol del
+      // inversionista o el del asesor (main.tsx re-renderiza al cambiar la sesión).
+      await signIn(await login({ email: email.trim(), password }));
+    } catch (e) {
+      setError(
+        e instanceof ApiError ? e.message : 'No se pudo iniciar sesión. Intenta de nuevo.',
+      );
+      setEnviando(false);
     }
   }
 
-  return (
-    <div className="flex flex-1 flex-col justify-center gap-6 p-6">
-      <div>
-        <p className="text-hero font-bold text-brand-ink">Brokeate</p>
-        <p className="text-body text-text-muted">Inicia sesión para continuar.</p>
-      </div>
+  // El borde del campo enfocado se tiñe de marca; si hubo error, los dos campos
+  // quedan en rojo porque el backend no dice cuál de los dos falló.
+  function claseCampo(campo: Campo) {
+    const borde = error
+      ? 'border-state-error'
+      : enfocado === campo
+        ? 'border-brand-primary bg-surface-background'
+        : 'border-surface-border bg-surface-elevated';
+    return `flex-row items-center gap-3 rounded-2xl border px-4 ${borde}`;
+  }
 
-      {/* <form> y no un onClick: así Enter envía, gratis, cosa que en RN no existía. */}
-      <form onSubmit={enviar} className="flex flex-col gap-3">
-        <input
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="correo@ejemplo.ec"
-          autoComplete="email"
-          className="rounded-2xl border border-surface-border bg-surface-background px-4 py-3.5 text-body-md text-text-primary outline-none focus:border-brand-primary"
-        />
-        <input
-          type="password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Contraseña"
-          autoComplete="current-password"
-          className="rounded-2xl border border-surface-border bg-surface-background px-4 py-3.5 text-body-md text-text-primary outline-none focus:border-brand-primary"
-        />
+  return (
+    <ScrollView
+      className="bg-surface-background"
+      contentContainerClassName="grow justify-center px-6 py-8 gap-6"
+    >
+      <View className="items-center">
+        <img src={logo} alt="Brokeate" className="h-56 w-56 object-contain" />
+      </View>
+
+      <View className="gap-5">
+        <View className="gap-1">
+          <Text className="text-display font-bold text-text-primary">Inicia sesión</Text>
+          <Text className="text-body text-text-secondary">
+            Entra para ver tu propuesta de inversión, o para revisar la cola de propuestas
+            si eres asesor.
+          </Text>
+        </View>
+
+        <View className="gap-4">
+          <View className="gap-2">
+            <Text className="text-caption font-bold uppercase text-text-secondary">
+              Correo
+            </Text>
+            <View className={claseCampo('email')}>
+              <Ionicons
+                name="mail-outline"
+                size={20}
+                color={enfocado === 'email' ? '#1E3A8A' : '#A1A1AA'}
+              />
+              <View className="flex-1">
+                <TextInput
+                  value={email}
+                  onChangeText={(v) => {
+                    setEmail(v);
+                    if (error) setError(null);
+                  }}
+                  placeholder="tu@correo.ec"
+                  keyboardType="email-address"
+                  editable={!enviando}
+                  onFocus={() => setEnfocado('email')}
+                  onBlur={() => setEnfocado(null)}
+                  className="w-full bg-transparent py-4 text-body-md text-text-primary"
+                />
+              </View>
+            </View>
+          </View>
+
+          <View className="gap-2">
+            <Text className="text-caption font-bold uppercase text-text-secondary">
+              Contraseña
+            </Text>
+            <View className={claseCampo('password')}>
+              <Ionicons
+                name="lock-closed-outline"
+                size={20}
+                color={enfocado === 'password' ? '#1E3A8A' : '#A1A1AA'}
+              />
+              <View className="flex-1">
+                <TextInput
+                  value={password}
+                  onChangeText={(v) => {
+                    setPassword(v);
+                    if (error) setError(null);
+                  }}
+                  placeholder="••••••••"
+                  secureTextEntry={!verPassword}
+                  editable={!enviando}
+                  onFocus={() => setEnfocado('password')}
+                  onBlur={() => setEnfocado(null)}
+                  onSubmitEditing={onSubmit}
+                  className="w-full bg-transparent py-4 text-body-md text-text-primary"
+                />
+              </View>
+              <Touchable
+                onPress={() => setVerPassword((v) => !v)}
+                accessibilityLabel={verPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              >
+                <Ionicons
+                  name={verPassword ? 'eye-off-outline' : 'eye-outline'}
+                  size={20}
+                  color="#71717A"
+                />
+              </Touchable>
+            </View>
+          </View>
+        </View>
 
         {error ? (
-          <div className="rounded-2xl bg-stateAlpha-errorSoft px-4 py-3">
-            <p className="text-body text-state-error">{error}</p>
-          </div>
+          <View className="flex-row items-center gap-2 rounded-2xl bg-stateAlpha-errorSoft px-4 py-3">
+            <Ionicons name="alert-circle" size={18} color="#EF4444" />
+            <Text className="flex-1 text-body text-state-error">{error}</Text>
+          </View>
         ) : null}
 
-        <button
-          type="submit"
-          disabled={cargando}
-          className="rounded-2xl bg-brand-primary px-6 py-3.5 text-body-md font-bold text-text-onPrimary transition-opacity hover:opacity-85 disabled:bg-brandAlpha-primaryMedium"
+        <Touchable
+          onPress={onSubmit}
+          disabled={!puedeEnviar}
+          className={`h-14 flex-row items-center justify-center gap-2 rounded-2xl ${
+            puedeEnviar ? 'bg-brand-primary' : 'bg-surface-secondary'
+          }`}
         >
-          {cargando ? 'Entrando…' : 'Entrar'}
-        </button>
-      </form>
+          {enviando ? (
+            <ActivityIndicator color="#FFFFFF" />
+          ) : (
+            <>
+              <Text
+                className={`text-body-md font-bold ${
+                  puedeEnviar ? 'text-text-onPrimary' : 'text-text-muted'
+                }`}
+              >
+                Iniciar sesión
+              </Text>
+              <Ionicons
+                name="arrow-forward"
+                size={18}
+                color={puedeEnviar ? '#FFFFFF' : '#A1A1AA'}
+              />
+            </>
+          )}
+        </Touchable>
+      </View>
 
-      {/* Atajo de demo. Se va con el port real de la Fase 7. */}
-      <div className="rounded-2xl bg-brandAlpha-primarySoft p-4">
-        <p className="text-caption uppercase text-brand-primary">Cuentas de demo</p>
-        <div className="mt-2 flex gap-2">
-          {(['inversionista', 'asesor'] as const).map((quien) => (
-            <button
-              key={quien}
-              type="button"
-              onClick={() => {
-                setEmail(`${quien}@demo.ec`)
-                setPassword('demo1234')
-              }}
-              className="rounded-xl bg-surface-background px-3 py-2 text-caption font-bold text-brand-mid hover:opacity-85"
-            >
-              {quien}
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-  )
+      <Text className="text-center text-caption text-text-muted">
+        Brokeate no ejecuta órdenes ni maneja tu dinero. Las propuestas son referenciales y
+        las revisa un asesor.
+      </Text>
+    </ScrollView>
+  );
 }
