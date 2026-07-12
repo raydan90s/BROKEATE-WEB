@@ -71,3 +71,17 @@ body {
     transform: rotate(360deg);
   }
 }
+
+/* Los tres puntos que laten mientras el asistente "escribe" (reemplaza el Animated de RN). */
+.punto-typing {
+  animation: punto-late 0.9s ease-in-out infinite;
+}
+@keyframes punto-late {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}

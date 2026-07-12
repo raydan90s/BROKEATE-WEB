@@ -9,9 +9,9 @@ Escrito el 11-jul-2026. **Fases 1–4 ejecutadas y verificadas.** Siguiente: Fas
 | 3 · TypeScript puro + servicios | ✅ hecha — 1.102 líneas; el backend responde |
 | 4 · Router | ✅ hecha — 14 rutas + guard por rol; login real contra el backend |
 | 5 · Primitivas | ✅ hecha — 10 primitivas; cascada verificada |
-| 6 · Componentes compartidos | ⬜ siguiente (1 de 10 ya portado) |
-| 7 · Pantallas | ⬜ |
-| 8 · Shell + despliegue | ⬜ |
+| 6 · Componentes compartidos | ✅ hecha — 10/10; donut SVG verificado por SSR |
+| 7 · Pantallas | ✅ hecha — 15 pantallas + agente; build limpio |
+| 8 · Shell + despliegue | ⬜ (pendiente: desplegar en Vercel) |
 
 Origen: `d:\GitHub\RoboAdvisorApp` (Expo SDK 54 · React Native 0.81 · NativeWind ·
 React Navigation).
@@ -400,9 +400,36 @@ Con esta capa, portar `Boton.tsx` (36 líneas) queda en cambiar 1 import y 3 ide
 
 ---
 
-## Fase 6 — Portar los componentes compartidos (≈2 h)
+## Fase 6 — Portar los componentes compartidos ✅ (hecha en ~1,5 h)
 
-En este orden, porque las pantallas los consumen:
+Los 10 quedaron en `src/components/shared/` (+ el donut en `app/inversionista/components/`).
+Todos pasan `tsc -b` y transforman en Vite sin errores. Cada uno conservó **su comentario
+original**, incluidos los guardarraíles de producto (ver abajo).
+
+Íconos: Ionicons → `react-icons/io5`, conversión mecánica —
+`arrow-back`→`IoArrowBack`, `sparkles`→`IoSparkles`, `information-circle`→`IoInformationCircle`,
+`chevron-down/up`→`IoChevronDown/Up`, `lock-closed-outline`→`IoLockClosedOutline`,
+`add-circle-outline`→`IoAddCircleOutline`. En web el ícono JSX no puede ir *inline* dentro
+de un `<Text>` como en RN, así que en `DisclaimerBanner` se envolvió en un `View` hermano.
+
+> ⚠️ **Guardarraíles preservados a conciencia** (criterio #3 del track, antialucinación):
+> `DisclaimerBanner` sigue **sin** botón de cerrar; el pie con fuente+fecha de
+> `Calificacion` sigue siendo **inseparable** del rating; `ExplicacionIA` sigue mostrando
+> el texto del LLM **literal**, sin parafrasear. Un port descuidado los borra sin notarlo.
+
+**Donut (`DonutPortafolio`, el único con SVG):** `react-native-svg` → SVG del DOM. Cambios
+reales: `<Svg>/<Circle>/<G>` → `<svg>/<circle>/<g>`, y `<G rotation originX originY>` →
+`<g transform="rotate(-90 cx cy)">`. Verificado renderizándolo con `react-dom/server`: React
+convierte `strokeDasharray` → `stroke-dasharray` (kebab), pinta los 3 arcos y aplica el
+`rotate(-90)`. El SVG es correcto.
+
+> 🔎 **Vitrina temporal:** `src/_vitrina.tsx` en la ruta `/vitrina` (fuera del guard)
+> renderiza los 10 con datos falsos para revisarlos con el ojo. **Se borra al empezar la
+> Fase 7**, junto con su ruta lazy en `rutas.tsx`.
+
+### Diseño original (referencia)
+
+Orden de port (las pantallas los consumen):
 
 1. `Tarjeta.tsx` (14 líneas) — trivial
 2. `Boton.tsx` (36) — `TouchableOpacity` → `Touchable`, `ActivityIndicator`
@@ -423,7 +450,41 @@ En este orden, porque las pantallas los consumen:
 
 ---
 
-## Fase 7 — Portar las pantallas (el grueso: ≈12–16 h)
+## Fase 7 — Portar las pantallas ✅ (hecha)
+
+Las 15 pantallas + el subsistema del agente, portadas. La app web es autónoma: **cero
+imports de `react-native`, `expo` o `@react-navigation` en `src`** (verificado por grep) y
+el bundle no arrastra RN. `npm run build` pasa limpio (tsc + vite).
+
+**Piezas nuevas que la app había ganado desde el inventario original** y que también se
+portaron: la ruta `/mercados` (`MercadosSimuladorPage` + `LineChart` SVG), `MarketTicker`,
+`RecomendacionIA`, `FormularioPreguntas`, `BarraCapital`, `TarjetaSubcuenta`, `HomeHeader`.
+
+**Infra del port** (lo que hizo que cada pantalla fuera casi copiar-pegar):
+- [`src/components/Icono.tsx`](./src/components/Icono.tsx) — `Ionicons` sobre `react-icons/io5`.
+  Cambiar el import `@expo/vector-icons` → `@/components/Icono` y el JSX no se toca.
+- [`src/routes/navegacion.ts`](./src/routes/navegacion.ts) — shim de React Navigation:
+  `useNavigation`, `useRoute`, `useFocusEffect` traducidos a React Router. Las pantallas
+  siguen escribiendo `navigation.navigate('Propuesta', params)`.
+
+**Adaptaciones web conscientes:**
+- `RefreshControl` (pull-to-refresh) → botón "Actualizar" (Cola) o se cae (Auditoría).
+- `Modal` de RN → overlay `fixed` (AgentSheet, EventoAuditoriaModal).
+- `Animated` (typing dots) → animación CSS `.punto-typing`.
+- `LineChart`/`DonutPortafolio` `react-native-svg` → SVG del DOM; el LineChart usa `viewBox`
+  + `width:100%` en vez de medir con `onLayout`.
+- `AgenteFab` se ancla con `position: fixed` dentro del ancho de la app, no a la esquina.
+- `HomePage`/`HomeBody` NO se portaron: son código muerto (nadie los importa; el router usa
+  `InicioPage`).
+
+> ⚠️ **`useFocusEffect` en web ≈ montaje.** El shim lo implementa como `useEffect(fn, [])`.
+> Funciona porque React Router desmonta la ruta al salir y la re-monta al volver, que es
+> justo cuando las pantallas quieren recargar. Si algún día dos rutas comparten componente
+> sin desmontar, habría que revisarlo.
+
+### Diseño original (referencia)
+
+Orden de port (fue el de la demo, con línea de corte):
 
 **En este orden**, que es el de la demo y también el del riesgo. La línea de corte está
 marcada: si el reloj se acaba, se entrega lo que esté por encima de ella.
@@ -496,7 +557,7 @@ Dos cosas más, y son las dos que se olvidan siempre:
 | 3 · TS puro + servicios | 0,5 h | ✅ ~0,5 h |
 | 4 · Router | 2 h | ✅ ~1,5 h |
 | 5 · Primitivas | 1 h | ✅ ~1 h |
-| 6 · Compartidos | 2 h | ⬜ |
+| 6 · Compartidos | 2 h | ✅ ~1,5 h |
 | 7 · Pantallas | 12–16 h | ⬜ |
 | 8 · Shell + deploy | 1 h | ⬜ |
 | **Restante** | **≈19–23 h** | |

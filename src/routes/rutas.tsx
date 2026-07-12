@@ -8,6 +8,7 @@ import ComoSeCalculoPage from '@/app/inversionista/pages/ComoSeCalculoPage'
 import ComparadorPage from '@/app/inversionista/pages/ComparadorPage'
 import CuestionarioPage from '@/app/inversionista/pages/CuestionarioPage'
 import InicioPage from '@/app/inversionista/pages/InicioPage'
+import MercadosSimuladorPage from '@/app/inversionista/pages/MercadosSimuladorPage'
 import MisSubcuentasPage from '@/app/inversionista/pages/MisSubcuentasPage'
 import NuevaSubcuentaPage from '@/app/inversionista/pages/NuevaSubcuentaPage'
 import PropuestaPage from '@/app/inversionista/pages/PropuestaPage'
@@ -58,6 +59,7 @@ export const router = createBrowserRouter([
           { path: '/como-se-calculo', element: <ComoSeCalculoPage /> },
           { path: '/comparador', element: <ComparadorPage /> },
           { path: '/simulador', element: <SimuladorPage /> },
+          { path: '/mercados', element: <MercadosSimuladorPage /> },
           { path: '/whatsapp', element: <VincularWhatsAppPage /> },
         ],
       },

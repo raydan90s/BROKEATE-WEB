@@ -67,8 +67,20 @@ export function Text({
 export function ScrollView({
   className = '',
   contentContainerClassName = '',
+  horizontal = false,
   children,
-}: Base & { contentContainerClassName?: string }) {
+}: Base & { contentContainerClassName?: string; horizontal?: boolean }) {
+  if (horizontal) {
+    // Fila que desliza en X. El contenido va en flex-row y sin encoger, para que las
+    // tarjetas conserven su ancho (w-36 del ticker) en vez de comprimirse.
+    return (
+      <div className={`overflow-x-auto ${className}`}>
+        <div className={`flex flex-row [&>*]:flex-shrink-0 ${contentContainerClassName}`}>
+          {children}
+        </div>
+      </div>
+    )
+  }
   return (
     <div className={`flex-1 overflow-y-auto ${className}`}>
       <div className={`rn-vista ${contentContainerClassName}`}>{children}</div>
@@ -154,6 +166,8 @@ export function TextInput({
   autoFocus = false,
   className = '',
   onSubmitEditing,
+  onFocus,
+  onBlur,
 }: {
   value: string
   onChangeText: (texto: string) => void
@@ -166,6 +180,8 @@ export function TextInput({
   autoFocus?: boolean
   className?: string
   onSubmitEditing?: () => void
+  onFocus?: () => void
+  onBlur?: () => void
 }) {
   const comun = {
     value,
@@ -173,6 +189,8 @@ export function TextInput({
     maxLength,
     autoFocus,
     disabled: !editable,
+    onFocus,
+    onBlur,
     onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       onChangeText(e.target.value),
     className: `outline-none placeholder:text-text-muted focus:border-brand-primary ${className}`,

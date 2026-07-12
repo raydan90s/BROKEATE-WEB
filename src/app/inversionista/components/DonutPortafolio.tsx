@@ -1,0 +1,97 @@
+import { Text, View } from '@/components/rn';
+
+import type { AssetAllocation } from '../types/inversionista';
+
+/** Un color por línea. El orden es estable: la leyenda y el donut siempre coinciden. */
+export const COLORES = ['#0A2540', '#1E5C9B', '#3A85C9', '#9BB8D4', '#1B8A5A'];
+
+interface DonutProps {
+  allocations: AssetAllocation[];
+  /** Se pinta en el centro: el monto total del que salen todos los porcentajes. */
+  centro: string;
+  etiquetaCentro: string;
+}
+
+const RADIO = 62;
+const GROSOR = 22;
+const CIRCUNFERENCIA = 2 * Math.PI * RADIO;
+const LADO = (RADIO + GROSOR / 2) * 2;
+
+/**
+ * Los porcentajes vienen de `allocation_template_items` vía la API. Este componente los
+ * dibuja; no los normaliza ni los redondea, porque hacerlo escondería un error de datos
+ * (si no suman 100, se ve el hueco — y eso es preferible a un donut que miente).
+ *
+ * Port desde react-native-svg: los atributos SVG son idénticos (strokeDasharray, cx…), el
+ * único cambio real es `<G rotation originX originY>` → `<g transform="rotate(-90 cx cy)">`
+ * y el texto central de un View absoluto a un div con position:absolute.
+ */
+export default function DonutPortafolio({
+  allocations,
+  centro,
+  etiquetaCentro,
+}: DonutProps) {
+  let acumulado = 0;
+
+  return (
+    <View className="items-center gap-4">
+      <View className="relative items-center justify-center">
+        <svg width={LADO} height={LADO}>
+          {/* rotate(-90): el primer arco arranca arriba, no a las 3 en punto. */}
+          <g transform={`rotate(-90 ${LADO / 2} ${LADO / 2})`}>
+            <circle
+              cx={LADO / 2}
+              cy={LADO / 2}
+              r={RADIO}
+              stroke="#F4F4F5"
+              strokeWidth={GROSOR}
+              fill="none"
+            />
+            {allocations.map((linea, i) => {
+              const largo = (linea.porcentaje / 100) * CIRCUNFERENCIA;
+              const offset = -(acumulado / 100) * CIRCUNFERENCIA;
+              acumulado += linea.porcentaje;
+
+              return (
+                <circle
+                  key={linea.instrumento_code}
+                  cx={LADO / 2}
+                  cy={LADO / 2}
+                  r={RADIO}
+                  stroke={COLORES[i % COLORES.length]}
+                  strokeWidth={GROSOR}
+                  strokeDasharray={`${largo} ${CIRCUNFERENCIA - largo}`}
+                  strokeDashoffset={offset}
+                  strokeLinecap="butt"
+                  fill="none"
+                />
+              );
+            })}
+          </g>
+        </svg>
+
+        <View className="absolute items-center">
+          <Text className="text-caption uppercase text-text-muted">{etiquetaCentro}</Text>
+          <Text className="text-title font-bold text-text-primary">{centro}</Text>
+        </View>
+      </View>
+
+      <View className="w-full gap-2">
+        {allocations.map((linea, i) => (
+          <View key={linea.instrumento_code} className="flex-row items-center gap-2">
+            <View
+              className="h-3 w-3 rounded-full"
+              style={{ backgroundColor: COLORES[i % COLORES.length] }}
+            />
+            <Text className="flex-1 text-body text-text-secondary" numberOfLines={1}>
+              {linea.nombre}
+            </Text>
+            <Text className="text-body font-bold text-text-primary">
+              {linea.porcentaje}%
+            </Text>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
