@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { Ionicons } from '@/components/Icono';
 import { ActivityIndicator, ScrollView, Text, Touchable, View } from '@/components/rn';
+import { useColores } from '@/context/ThemeContext';
 import { fechaHoraLarga, porcentaje, usd } from '@/utils/formato';
 
 import { getPropuesta } from '../services/advisorApi';
@@ -69,6 +70,7 @@ export default function EventoAuditoriaModal({
   onCerrar: () => void;
   onVerPropuesta?: () => void;
 }) {
+  const colores = useColores();
   const [propuesta, setPropuesta] = useState<PropuestaDetalle | null>(null);
 
   const entityId = evento?.entity_id;
@@ -112,7 +114,7 @@ export default function EventoAuditoriaModal({
             </Text>
           </View>
           <Touchable onPress={onCerrar} accessibilityLabel="Cerrar el detalle">
-            <Ionicons name="close" size={24} color="#6B7280" />
+            <Ionicons name="close" size={24} color={colores.textoMuted} />
           </Touchable>
         </View>
 
@@ -131,7 +133,7 @@ export default function EventoAuditoriaModal({
             <Text className="text-caption uppercase text-text-muted">Entidad</Text>
             {esPropuesta && !propuesta ? (
               <View className="flex-row items-center gap-2 py-0.5">
-                <ActivityIndicator size="small" color="#6B7280" />
+                <ActivityIndicator size="small" color={colores.textoMuted} />
                 <Text className="text-body text-text-muted">Resolviendo la propuesta…</Text>
               </View>
             ) : (
@@ -197,7 +199,7 @@ export default function EventoAuditoriaModal({
               <Text className="text-body font-bold text-brand-primary">
                 Ver la propuesta auditada
               </Text>
-              <Ionicons name="chevron-forward" size={18} color="#14375E" />
+              <Ionicons name="chevron-forward" size={18} color={colores.primario} />
             </Touchable>
           ) : null}
 

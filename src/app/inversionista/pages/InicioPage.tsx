@@ -2,13 +2,13 @@ import { useCallback, useState } from 'react';
 
 import { Ionicons } from '@/components/Icono';
 import { ScrollView, Text, Touchable, View } from '@/components/rn';
+import { useColores } from '@/context/ThemeContext';
 import { useFocusEffect, useNavigation } from '@/routes/navegacion';
 
 import AgenteFab from '@/app/agente/components/AgenteFab';
 import DisclaimerBanner from '@/components/shared/DisclaimerBanner';
 import { Cargando, ErrorEstado } from '@/components/shared/Estados';
 import { useAuth } from '@/context/AuthContext';
-import HomeHeader from '@/screens/inicio/home/components/HomeHeader';
 import { ApiError } from '@/services/http';
 import { puntos, usd } from '@/utils/formato';
 
@@ -21,8 +21,9 @@ import type { Investor } from '../types/inversionista';
  * "todavía no te has perfilado".
  */
 export default function InicioPage() {
+  const colores = useColores();
   const navigation = useNavigation();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
   const [perfil, setPerfil] = useState<Investor | null>(null);
   const [sinPerfilar, setSinPerfilar] = useState(false);
@@ -55,14 +56,8 @@ export default function InicioPage() {
   );
 
   return (
+    // Saludo y logout viven en la cabecera del layout: son de la sesión, no de la página.
     <View className="flex-1 bg-surface-background">
-      <HomeHeader
-        title={user ? `Hola, ${user.name}` : 'Inicio'}
-        subtitle="Inversionista"
-        actionIcon="log-out-outline"
-        onAction={() => void logout()}
-      />
-
       {cargando ? (
         <Cargando />
       ) : error ? (
@@ -111,7 +106,7 @@ export default function InicioPage() {
                 className="flex-row items-center justify-between rounded-2xl bg-brand-primary px-5 py-4"
               >
                 <Text className="text-body-md font-bold text-text-onPrimary">Ver mi propuesta</Text>
-                <Ionicons name="chevron-forward" size={20} color="#FFFFFF" />
+                <Ionicons name="chevron-forward" size={20} color={colores.textoSobrePrimario} />
               </Touchable>
 
               <Touchable
@@ -121,7 +116,7 @@ export default function InicioPage() {
                 <Text className="text-body-md font-bold text-brand-primary">
                   ¿Cómo se calculó mi perfil?
                 </Text>
-                <Ionicons name="chevron-forward" size={20} color="#14375E" />
+                <Ionicons name="chevron-forward" size={20} color={colores.primario} />
               </Touchable>
 
               <Touchable

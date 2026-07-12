@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Ionicons } from '@/components/Icono';
 import { ScrollView, Text, Touchable, View, abrirEnlace } from '@/components/rn';
+import { useColores } from '@/context/ThemeContext';
 import { useFocusEffect, useNavigation } from '@/routes/navegacion';
 
 import BotonAtras from '@/components/shared/BotonAtras';
@@ -67,6 +68,7 @@ function CodigoVivo({ codigo, onExpirar }: { codigo: LinkCode; onExpirar: () => 
  * propio canal.
  */
 export default function VincularWhatsAppPage() {
+  const colores = useColores();
   const navigation = useNavigation();
   const [estado, setEstado] = useState<WhatsAppStatus | null>(null);
   const [codigo, setCodigo] = useState<LinkCode | null>(null);
@@ -138,7 +140,7 @@ export default function VincularWhatsAppPage() {
             Pregunta por tus inversiones desde el chat
           </Text>
         </View>
-        <Ionicons name="logo-whatsapp" size={24} color="#1B8A5A" />
+        <Ionicons name="logo-whatsapp" size={24} color={colores.exito} />
       </View>
 
       {cargando ? (
@@ -151,7 +153,7 @@ export default function VincularWhatsAppPage() {
             <>
               <View className="gap-3 rounded-2xl border border-surface-border bg-surface-background p-5">
                 <View className="flex-row items-center gap-2">
-                  <Ionicons name="checkmark-circle" size={20} color="#1B8A5A" />
+                  <Ionicons name="checkmark-circle" size={20} color={colores.exito} />
                   <Text className="text-body-md font-bold text-text-primary">
                     WhatsApp vinculado
                   </Text>
@@ -168,7 +170,7 @@ export default function VincularWhatsAppPage() {
                 disabled={ocupado}
                 className="flex-row items-center justify-center gap-2 rounded-2xl border border-surface-border py-4"
               >
-                <Ionicons name="unlink-outline" size={18} color="#C0362C" />
+                <Ionicons name="unlink-outline" size={18} color={colores.error} />
                 <Text className="text-body font-bold text-state-error">
                   Desvincular este número
                 </Text>
@@ -217,7 +219,7 @@ export default function VincularWhatsAppPage() {
                     onPress={() => abrirWhatsApp(codigo.instruccion)}
                     className="flex-row items-center justify-center gap-2 rounded-2xl bg-state-success py-4"
                   >
-                    <Ionicons name="logo-whatsapp" size={20} color="#FFFFFF" />
+                    <Ionicons name="logo-whatsapp" size={20} color={colores.textoSobrePrimario} />
                     <Text className="text-body-md font-bold text-text-onPrimary">
                       Abrir WhatsApp con el mensaje listo
                     </Text>
@@ -237,7 +239,7 @@ export default function VincularWhatsAppPage() {
                     ocupado ? 'bg-brandAlpha-primaryMedium' : 'bg-brand-primary'
                   }`}
                 >
-                  <Ionicons name="key-outline" size={20} color="#FFFFFF" />
+                  <Ionicons name="key-outline" size={20} color={colores.textoSobrePrimario} />
                   <Text className="text-body-md font-bold text-text-onPrimary">
                     Generar código de vinculación
                   </Text>

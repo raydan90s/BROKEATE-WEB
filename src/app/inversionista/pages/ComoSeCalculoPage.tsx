@@ -6,7 +6,7 @@ import { useNavigation, useRoute } from '@/routes/navegacion';
 
 import BotonAtras from '@/components/shared/BotonAtras';
 import { Cargando, ErrorEstado } from '@/components/shared/Estados';
-import { COLORES } from '@/constants/colores';
+import { useColores } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 import { ApiError } from '@/services/http';
 import { usd } from '@/utils/formato';
@@ -23,6 +23,7 @@ import type { Pregunta, ProfilingBreakdown } from '../types/inversionista';
  * re-puntúa en el servidor, regenera la propuesta y la devuelve a la cola del asesor.
  */
 export default function ComoSeCalculoPage() {
+  const colores = useColores();
   const navigation = useNavigation();
   const { params } = useRoute<{ investorId?: string; sessionId?: string }>();
   const { user } = useAuth();
@@ -132,7 +133,7 @@ export default function ComoSeCalculoPage() {
               onPress={() => void abrirEdicion(datos)}
               className="flex-row items-center gap-1"
             >
-              <Ionicons name="create-outline" size={18} color={COLORES.primario} />
+              <Ionicons name="create-outline" size={18} color={colores.primario} />
               <Text className="text-body font-bold text-brand-primary">Editar</Text>
             </Touchable>
           )
@@ -165,7 +166,7 @@ export default function ComoSeCalculoPage() {
 
         {reenviado && !editando ? (
           <View className="flex-row items-start gap-3 rounded-2xl bg-stateAlpha-successSoft px-5 py-4">
-            <Ionicons name="checkmark-circle" size={20} color={COLORES.exito} />
+            <Ionicons name="checkmark-circle" size={20} color={colores.exito} />
             <Text className="flex-1 text-body leading-5 text-text-primary">
               Tu perfil quedó actualizado y tu propuesta se regeneró con él. Un asesor la
               revisará de nuevo: vuelve a estar pendiente de revisión.
@@ -176,7 +177,7 @@ export default function ComoSeCalculoPage() {
         {editando ? (
           <>
             <View className="flex-row items-start gap-3 rounded-2xl bg-brandAlpha-primarySoft px-5 py-4">
-              <Ionicons name="information-circle" size={20} color={COLORES.primario} />
+              <Ionicons name="information-circle" size={20} color={colores.primario} />
               <Text className="flex-1 text-body leading-5 text-text-primary">
                 Al guardar se recalcula tu puntaje y tu propuesta se rearma según el perfil
                 que resulte. Vuelve a quedar pendiente de la revisión de un asesor, incluso
@@ -185,7 +186,7 @@ export default function ComoSeCalculoPage() {
             </View>
 
             {preguntas === null ? (
-              <ActivityIndicator color={COLORES.primario} />
+              <ActivityIndicator color={colores.primario} />
             ) : (
               <FormularioPreguntas
                 preguntas={preguntas}
@@ -210,7 +211,7 @@ export default function ComoSeCalculoPage() {
               }`}
             >
               {guardando ? (
-                <ActivityIndicator color="#FFFFFF" />
+                <ActivityIndicator color={colores.textoSobrePrimario} />
               ) : (
                 <Text
                   className={`text-body-md font-bold ${
@@ -291,7 +292,7 @@ export default function ComoSeCalculoPage() {
             {datos.regla_institucion ? (
               <View className="gap-2 rounded-2xl border border-surface-border bg-surface-background p-5">
                 <View className="flex-row items-center gap-2">
-                  <Ionicons name="shield-checkmark-outline" size={16} color="#14375E" />
+                  <Ionicons name="shield-checkmark-outline" size={16} color={colores.primario} />
                   <Text className="text-caption font-bold uppercase text-text-secondary">
                     Solidez del emisor
                   </Text>
@@ -312,7 +313,7 @@ export default function ComoSeCalculoPage() {
                 onPress={() => void abrirEdicion(datos)}
                 className="flex-row items-center gap-3 rounded-2xl border border-brand-primary bg-surface-background px-5 py-4"
               >
-                <Ionicons name="create-outline" size={20} color={COLORES.primario} />
+                <Ionicons name="create-outline" size={20} color={colores.primario} />
                 <View className="flex-1">
                   <Text className="text-body-md font-bold text-brand-primary">
                     Editar mis respuestas
@@ -321,7 +322,7 @@ export default function ComoSeCalculoPage() {
                     Se recalcula tu perfil y tu propuesta vuelve a revisión.
                   </Text>
                 </View>
-                <Ionicons name="chevron-forward" size={20} color={COLORES.primario} />
+                <Ionicons name="chevron-forward" size={20} color={colores.primario} />
               </Touchable>
             ) : null}
 

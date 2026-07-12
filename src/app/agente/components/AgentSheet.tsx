@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Ionicons } from '@/components/Icono';
 import { Text, TextInput, Touchable, View } from '@/components/rn';
+import { useColores } from '@/context/ThemeContext';
 import { ApiError } from '@/services/http';
 
 import { enviarMensaje, getProviders, type ProviderInfo } from '../services/agentApi';
@@ -34,6 +35,7 @@ let contador = 0;
 const nuevoId = () => `m${++contador}`;
 
 export default function AgentSheet({ visible, onClose, sessionId }: Props) {
+  const colores = useColores();
   const [mensajes, setMensajes] = useState<Mensaje[]>([saludo()]);
   const [input, setInput] = useState('');
   const [enviando, setEnviando] = useState(false);
@@ -139,7 +141,7 @@ export default function AgentSheet({ visible, onClose, sessionId }: Props) {
         <View className="flex-row items-center justify-between border-b border-surface-border px-4 py-3">
           <View className="flex-1 flex-row items-center gap-3">
             <View className="h-10 w-10 items-center justify-center rounded-2xl bg-brandAlpha-primarySoft">
-              <Ionicons name="sparkles" size={18} color="#1E3A8A" />
+              <Ionicons name="sparkles" size={18} color={colores.primario} />
             </View>
             <Text className="text-body-md font-bold text-text-primary">Asistente</Text>
           </View>
@@ -155,7 +157,7 @@ export default function AgentSheet({ visible, onClose, sessionId }: Props) {
               onPress={onClose}
               className="h-8 w-8 items-center justify-center rounded-xl bg-surface-secondary"
             >
-              <Ionicons name="close" size={18} color="#71717A" />
+              <Ionicons name="close" size={18} color={colores.textoMuted} />
             </Touchable>
           </View>
         </View>
@@ -174,7 +176,7 @@ export default function AgentSheet({ visible, onClose, sessionId }: Props) {
                   onPress={() => enviar(s)}
                   className="flex-row items-center gap-2 self-start rounded-full border border-brandAlpha-primaryMedium bg-surface-background px-3.5 py-2"
                 >
-                  <Ionicons name="chatbubble-ellipses-outline" size={13} color="#1E3A8A" />
+                  <Ionicons name="chatbubble-ellipses-outline" size={13} color={colores.primario} />
                   <Text className="text-body text-brand-primary">{s}</Text>
                 </Touchable>
               ))}
@@ -200,7 +202,7 @@ export default function AgentSheet({ visible, onClose, sessionId }: Props) {
               !input.trim() || enviando ? 'bg-surface-divider' : 'bg-brand-primary'
             }`}
           >
-            <Ionicons name="arrow-up" size={20} color="#FFFFFF" />
+            <Ionicons name="arrow-up" size={20} color={colores.textoSobrePrimario} />
           </Touchable>
         </View>
       </div>

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { ActivityIndicator, ScrollView, Text, TextInput, Touchable, View } from '@/components/rn';
+import { useColores } from '@/context/ThemeContext';
 import { useNavigation } from '@/routes/navegacion';
 
 import BotonAtras from '@/components/shared/BotonAtras';
@@ -36,6 +37,7 @@ function Cabecera({ paso, titulo, onAtras }: { paso: Paso; titulo: string; onAtr
  * es el servidor**. Si el backend responde 422, el mensaje que se ve es el suyo.
  */
 export default function NuevaSubcuentaPage() {
+  const colores = useColores();
   const navigation = useNavigation();
   const { user } = useAuth();
 
@@ -276,7 +278,7 @@ export default function NuevaSubcuentaPage() {
               }`}
             >
               {enviando ? (
-                <ActivityIndicator color="#FFFFFF" />
+                <ActivityIndicator color={colores.textoSobrePrimario} />
               ) : (
                 <Text
                   className={`text-body-md font-bold ${

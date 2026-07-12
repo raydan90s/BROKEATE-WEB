@@ -9,7 +9,7 @@ import type { SimuladorResponse } from '@/app/agente/services/agentApi';
 import Calificacion from '@/components/shared/Calificacion';
 import { Cargando, ErrorEstado } from '@/components/shared/Estados';
 import Tarjeta from '@/components/shared/Tarjeta';
-import { COLORES } from '@/constants/colores';
+import { useColores } from '@/context/ThemeContext';
 import { ApiError } from '@/services/http';
 import { montoANumero, montoConSeparadores, porcentaje, usd } from '@/utils/formato';
 
@@ -39,6 +39,7 @@ const NOMBRE_PERFIL: Record<string, string> = {
  * El monto es opcional; con él, Postgres devuelve interés e importe final y se habilita la IA.
  */
 export default function ComparadorPage() {
+  const colores = useColores();
   const navigation = useNavigation();
   const { params } = useRoute<{ monto?: number }>();
 
@@ -106,7 +107,7 @@ export default function ComparadorPage() {
           onPress={() => navigation.goBack()}
           className="h-8 w-8 items-center justify-center rounded-xl"
         >
-          <Ionicons name="chevron-back" size={22} color={COLORES.primario} />
+          <Ionicons name="chevron-back" size={22} color={colores.primario} />
         </Touchable>
         <View className="flex-1">
           <Text className="text-title font-bold text-text-primary">Comparador de tasas</Text>
@@ -210,7 +211,7 @@ export default function ComparadorPage() {
           </Tarjeta>
 
           <View className="flex-row gap-2 rounded-2xl border border-surface-border bg-brandAlpha-primarySoft p-4">
-            <Ionicons name="information-circle-outline" size={16} color={COLORES.azulMedio} />
+            <Ionicons name="information-circle-outline" size={16} color={colores.azulMedio} />
             <Text className="flex-1 text-caption leading-4 text-text-muted">
               <Text className="font-bold text-text-secondary">A mayor tasa, mayor riesgo. </Text>
               La mejor tasa del catálogo viene de la institución con la calificación más baja:
@@ -224,6 +225,7 @@ export default function ComparadorPage() {
 }
 
 function FilaTasa({ tasa, esPrimera }: { tasa: TasaInstrumento; esPrimera: boolean }) {
+  const colores = useColores();
   const bloqueada = tasa.elegible === false;
 
   return (
@@ -263,7 +265,7 @@ function FilaTasa({ tasa, esPrimera }: { tasa: TasaInstrumento; esPrimera: boole
 
       {bloqueada && tasa.motivo_no_elegible ? (
         <View className="flex-row gap-2 rounded-xl bg-stateAlpha-warningSoft p-3">
-          <Ionicons name="lock-closed-outline" size={14} color={COLORES.advertencia} />
+          <Ionicons name="lock-closed-outline" size={14} color={colores.advertencia} />
           <Text className="flex-1 text-caption leading-4 text-text-secondary">
             <Text className="font-bold">No disponible para tu perfil. </Text>
             {tasa.motivo_no_elegible}

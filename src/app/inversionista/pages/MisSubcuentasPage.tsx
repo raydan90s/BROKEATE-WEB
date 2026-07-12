@@ -7,9 +7,8 @@ import { useFocusEffect, useNavigation } from '@/routes/navegacion';
 import AgenteFab from '@/app/agente/components/AgenteFab';
 import DisclaimerBanner from '@/components/shared/DisclaimerBanner';
 import { Cargando, ErrorEstado } from '@/components/shared/Estados';
-import { COLORES } from '@/constants/colores';
+import { useColores } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
-import HomeHeader from '@/screens/inicio/home/components/HomeHeader';
 import { ApiError } from '@/services/http';
 
 import BarraCapital from '../components/BarraCapital';
@@ -28,6 +27,7 @@ function EditorCapital({
   capitalActual: number | null;
   onGuardado: (resumen: ResumenCapital) => void;
 }) {
+  const colores = useColores();
   const [abierto, setAbierto] = useState(false);
   const [texto, setTexto] = useState('');
   const [guardando, setGuardando] = useState(false);
@@ -56,7 +56,7 @@ function EditorCapital({
         onPress={() => setAbierto(true)}
         className="flex-row items-center gap-2 self-start"
       >
-        <Ionicons name="create-outline" size={16} color="#1E3A8A" />
+        <Ionicons name="create-outline" size={16} color={colores.primario} />
         <Text className="text-body font-bold text-brand-primary">
           {capitalActual == null ? 'Declarar mi capital total' : 'Cambiar capital total'}
         </Text>
@@ -86,7 +86,7 @@ function EditorCapital({
           }`}
         >
           {guardando ? (
-            <ActivityIndicator color="#FFFFFF" />
+            <ActivityIndicator color={colores.textoSobrePrimario} />
           ) : (
             <Text
               className={`text-body font-bold ${
@@ -125,12 +125,14 @@ function AccesoHerramienta({
   detalle: string;
   onPress: () => void;
 }) {
+  const colores = useColores();
+
   return (
     <Touchable
       onPress={onPress}
       className="flex-1 gap-1 rounded-2xl border border-surface-border bg-surface-background p-4"
     >
-      <Ionicons name={icono} size={20} color={COLORES.primario} />
+      <Ionicons name={icono} size={20} color={colores.primario} />
       <Text className="text-body font-bold text-text-primary">{titulo}</Text>
       <Text className="text-caption leading-4 text-text-muted">{detalle}</Text>
     </Touchable>
@@ -144,8 +146,9 @@ function AccesoHerramienta({
  * `sin_asignar` llegan sumados por SQL.
  */
 export default function MisSubcuentasPage() {
+  const colores = useColores();
   const navigation = useNavigation();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
   const [resumen, setResumen] = useState<ResumenCapital | null>(null);
   const [cargando, setCargando] = useState(true);
@@ -172,14 +175,9 @@ export default function MisSubcuentasPage() {
   );
 
   return (
+    // El saludo y el logout ya no van acá: viven en la cabecera del layout, junto a las
+    // pestañas. Son de la sesión, no de esta pantalla.
     <View className="flex-1 bg-surface-background">
-      <HomeHeader
-        title={user ? `Hola, ${user.name}` : 'Inicio'}
-        subtitle="Tus subcuentas"
-        actionIcon="log-out-outline"
-        onAction={() => void logout()}
-      />
-
       {cargando ? (
         <Cargando />
       ) : error ? (
@@ -230,22 +228,9 @@ export default function MisSubcuentasPage() {
               />
             </View>
 
-            {/* El asistente vive también fuera de la app: el mismo agente por WhatsApp. */}
-            <Touchable
-              onPress={() => navigation.navigate('VincularWhatsApp')}
-              className="flex-row items-center gap-3 rounded-2xl border border-surface-border bg-surface-background p-4"
-            >
-              <Ionicons name="logo-whatsapp" size={24} color={COLORES.exito} />
-              <View className="flex-1">
-                <Text className="text-body font-bold text-text-primary">
-                  Pregúntame por WhatsApp
-                </Text>
-                <Text className="text-caption leading-4 text-text-muted">
-                  Tus inversiones y el catálogo, desde el chat. Vincula tu número.
-                </Text>
-              </View>
-              <Ionicons name="chevron-forward" size={18} color={COLORES.textoMuted} />
-            </Touchable>
+            {/* La entrada a WhatsApp NO va acá: el FAB flotante ya la ofrece (al pasar el
+                cursor por el botón del asistente sale el de WhatsApp, y lleva a la misma
+                pantalla de vinculación). Tenerla dos veces en el Home era ruido. */}
 
             {resumen.subcuentas.length === 0 ? (
               <View className="gap-2 rounded-2xl border border-surface-border bg-surface-background p-5">
@@ -285,7 +270,7 @@ export default function MisSubcuentasPage() {
               onPress={() => navigation.navigate('NuevaSubcuenta')}
               className="mx-auto w-full max-w-6xl flex-row items-center justify-center gap-2 rounded-2xl bg-brand-primary py-4"
             >
-              <Ionicons name="add" size={20} color="#FFFFFF" />
+              <Ionicons name="add" size={20} color={colores.textoSobrePrimario} />
               <Text className="text-body-md font-bold text-text-onPrimary">
                 Nueva subcuenta
               </Text>

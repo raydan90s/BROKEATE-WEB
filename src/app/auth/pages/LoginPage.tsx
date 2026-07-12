@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 import { Ionicons } from '@/components/Icono';
 import { ActivityIndicator, ScrollView, Text, TextInput, Touchable, View } from '@/components/rn';
+import { useColores } from '@/context/ThemeContext';
 import BotonTema from '@/components/shared/BotonTema';
 import { useAuth } from '@/context/AuthContext';
 import { ApiError } from '@/services/http';
@@ -15,6 +16,7 @@ const logo = '/logo.png';
 type Campo = 'email' | 'password';
 
 export default function LoginPage() {
+  const colores = useColores();
   const { signIn } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -106,7 +108,7 @@ export default function LoginPage() {
               <Ionicons
                 name="mail-outline"
                 size={20}
-                color={enfocado === 'email' ? '#1E3A8A' : '#A1A1AA'}
+                color={enfocado === 'email' ? colores.primario : colores.textoMuted}
               />
               <View className="flex-1">
                 <TextInput
@@ -134,7 +136,7 @@ export default function LoginPage() {
               <Ionicons
                 name="lock-closed-outline"
                 size={20}
-                color={enfocado === 'password' ? '#1E3A8A' : '#A1A1AA'}
+                color={enfocado === 'password' ? colores.primario : colores.textoMuted}
               />
               <View className="flex-1">
                 <TextInput
@@ -159,7 +161,7 @@ export default function LoginPage() {
                 <Ionicons
                   name={verPassword ? 'eye-off-outline' : 'eye-outline'}
                   size={20}
-                  color="#71717A"
+                  color={colores.textoMuted}
                 />
               </Touchable>
             </View>
@@ -178,7 +180,7 @@ export default function LoginPage() {
 
         {error ? (
           <View className="flex-row items-center gap-2 rounded-2xl bg-stateAlpha-errorSoft px-4 py-3">
-            <Ionicons name="alert-circle" size={18} color="#EF4444" />
+            <Ionicons name="alert-circle" size={18} color={colores.error} />
             <Text className="flex-1 text-body text-state-error">{error}</Text>
           </View>
         ) : null}
@@ -191,7 +193,7 @@ export default function LoginPage() {
           }`}
         >
           {enviando ? (
-            <ActivityIndicator color="#FFFFFF" />
+            <ActivityIndicator color={colores.textoSobrePrimario} />
           ) : (
             <>
               <Text
@@ -204,7 +206,7 @@ export default function LoginPage() {
               <Ionicons
                 name="arrow-forward"
                 size={18}
-                color={puedeEnviar ? '#FFFFFF' : '#A1A1AA'}
+                color={puedeEnviar ? colores.textoSobrePrimario : colores.textoMuted}
               />
             </>
           )}

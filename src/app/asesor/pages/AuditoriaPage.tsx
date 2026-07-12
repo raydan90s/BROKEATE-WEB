@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { Ionicons } from '@/components/Icono';
 import { ScrollView, Text, TextInput, Touchable, View } from '@/components/rn';
+import { useColores } from '@/context/ThemeContext';
 import { useFocusEffect, useNavigation } from '@/routes/navegacion';
 
 import { Cargando, ErrorEstado, Vacio } from '@/components/shared/Estados';
@@ -59,6 +60,7 @@ function textoBuscable(e: EventoAuditoria): string {
  * consulta: el contador dice siempre cuántas de cuántas se ven.
  */
 export default function AuditoriaPage() {
+  const colores = useColores();
   const navigation = useNavigation();
 
   const [eventos, setEventos] = useState<EventoAuditoria[] | null>(null);
@@ -122,7 +124,7 @@ export default function AuditoriaPage() {
         {decisiones.length > 0 ? (
           <>
             <View className="flex-row items-center gap-2 rounded-2xl bg-surface-canvas px-4 py-2.5">
-              <Ionicons name="search" size={16} color="#6B7280" />
+              <Ionicons name="search" size={16} color={colores.textoMuted} />
               <View className="flex-1">
                 <TextInput
                   value={busqueda}
@@ -133,7 +135,7 @@ export default function AuditoriaPage() {
               </View>
               {busqueda !== '' ? (
                 <Touchable onPress={() => setBusqueda('')} accessibilityLabel="Limpiar la búsqueda">
-                  <Ionicons name="close-circle" size={16} color="#6B7280" />
+                  <Ionicons name="close-circle" size={16} color={colores.textoMuted} />
                 </Touchable>
               ) : null}
             </View>
@@ -252,7 +254,7 @@ export default function AuditoriaPage() {
                     </Text>
                   </View>
 
-                  <Ionicons name="chevron-forward" size={18} color="#A1A1AA" />
+                  <Ionicons name="chevron-forward" size={18} color={colores.textoMuted} />
                 </Touchable>
               );
             })}

@@ -85,8 +85,13 @@ export function ScrollView({
   // en una columna de lectura (`mx-auto max-w-3xl`) para que el texto no cruce media pantalla.
   // Una pantalla que quiera una columna más ancha (listas, detalle) solo tiene que anexar un
   // `max-w-*` mayor a su `contentContainerClassName`: la utilidad más grande de Tailwind gana.
+  //
+  // `min-h-0`: un hijo flex no encoge por debajo de su contenido por defecto, así que sin
+  // esto el div crece en vez de scrollear y arrastra consigo a lo que debería quedar fijo
+  // (la barra de tabs, el botón del pie). El `overflow-y-auto` solo hace algo si el div
+  // tiene permitido ser más bajo que su contenido.
   return (
-    <div className={`flex-1 overflow-y-auto ${className}`}>
+    <div className={`min-h-0 flex-1 overflow-y-auto ${className}`}>
       <div className={`rn-vista mx-auto w-full max-w-3xl ${contentContainerClassName}`}>
         {children}
       </div>
@@ -130,10 +135,15 @@ export function Touchable({
 /** Alias: en las pantallas conviven `TouchableOpacity` y `Pressable`. */
 export const Pressable = Touchable
 
-/** <ActivityIndicator> → spinner CSS. Misma API: `size` y `color`. */
+/**
+ * <ActivityIndicator> → spinner CSS. Misma API: `size` y `color`.
+ *
+ * Por defecto hereda el color del texto (`currentColor`) en vez de un azul marino fijo:
+ * un hex de la paleta clara aquí se volvía invisible en oscuro.
+ */
 export function ActivityIndicator({
   size = 'small',
-  color = '#14375E',
+  color = 'currentColor',
 }: {
   size?: 'small' | 'large'
   color?: string

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { IoChevronDown, IoChevronUp, IoSparkles } from 'react-icons/io5';
 
 import { Text, Touchable, View } from '@/components/rn';
-import { COLORES } from '@/constants/colores';
+import { useColores } from '@/context/ThemeContext';
 import { formatearExplicacion } from '@/utils/explicacion';
 
 interface Props {
@@ -25,6 +25,7 @@ export default function ExplicacionIA({
   titulo = 'Por qué esta propuesta',
   conservarDisclaimer = false,
 }: Props) {
+  const colores = useColores();
   const { resumen, detalle } = useMemo(
     () => formatearExplicacion(texto, { conservarDisclaimer }),
     [texto, conservarDisclaimer]
@@ -38,7 +39,7 @@ export default function ExplicacionIA({
   return (
     <View className="gap-3 rounded-2xl bg-brandAlpha-primarySoft p-5">
       <View className="flex-row items-center gap-2">
-        <IoSparkles size={16} color={COLORES.primario} />
+        <IoSparkles size={16} color={colores.primario} />
         <Text className="text-caption font-bold uppercase text-brand-primary">{titulo}</Text>
       </View>
 
@@ -76,9 +77,9 @@ export default function ExplicacionIA({
             {abierto ? 'Ver menos' : 'Ver explicación completa'}
           </Text>
           {abierto ? (
-            <IoChevronUp size={14} color={COLORES.primario} />
+            <IoChevronUp size={14} color={colores.primario} />
           ) : (
-            <IoChevronDown size={14} color={COLORES.primario} />
+            <IoChevronDown size={14} color={colores.primario} />
           )}
         </Touchable>
       ) : null}
