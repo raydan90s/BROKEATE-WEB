@@ -13,6 +13,7 @@ import Tarjeta from '@/components/shared/Tarjeta';
 import { COLORES } from '@/constants/colores';
 import { ApiError } from '@/services/http';
 
+import FeedNoticias from '../components/FeedNoticias';
 import { getCotizaciones, getHistorico } from '../services/marketApi';
 import type { HistoricalSeries, MarketQuote } from '../services/marketApi';
 
@@ -51,7 +52,7 @@ function TarjetaRecomendacion({ respuesta }: { respuesta: AgentChatResponse }) {
           Simulación educativa · fuera del banco
         </Text>
       </View>
-      <Text className="text-body text-text-primary">{respuesta.texto}</Text>
+      <Text className="text-body whitespace-pre-line text-text-primary">{respuesta.texto}</Text>
       {respuesta.sources.length ? <SourceChips sources={respuesta.sources} /> : null}
     </View>
   );
@@ -249,6 +250,10 @@ export default function MercadosSimuladorPage() {
             {recomendacion ? <TarjetaRecomendacion respuesta={recomendacion} /> : null}
           </>
         )}
+
+        {/* El feed de noticias (sugerencia del jurado): se carga aparte del ticker,
+            así una cosa no bloquea a la otra. */}
+        <FeedNoticias />
       </ScrollView>
     </View>
   );
